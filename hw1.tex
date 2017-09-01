@@ -1,0 +1,49 @@
+\documentclass[12pt]{article}
+
+\usepackage{fancyhdr} 
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{dsfont}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Shaw \space \thepage}
+
+\setlength\parindent{0pt}
+
+\begin{document}
+	\thispagestyle{empty}
+	
+	\begin{flushright}
+		Sage Shaw \\
+		m565 - Fall 2017 \\
+		Sep. 9, 2017
+	\end{flushright}
+	
+	{\large \textbf{HW 1:XXXXXXXX}}\bigbreak
+
+	\hspace{-4 ex}\textbf{1 (d) } Show that for any $a_{0} > b_{0} > 0$ that $\{a_{n}\}$ and $\{b_{n}\}$ converge quadratically to
+	some number which we will call $M(a_{0}, b_{0})$. \\
+	
+	\begin{proof}
+		Since $a_{0} > b_{0}$, $a_{1} = \frac{1}{2} (a_{0}+b_{0}) < \frac{1}{2} (a_{0}+a_{0}) = a_{0}$. \\
+		Thus $a_{1} < a_{0}$. \\
+		Similarly since $a_{0} > b_{0}$, $a_{1} = \frac{1}{2} (a_{0}+b_{0}) > \frac{1}{2} (b_{0}+b_{0}) = b_{0}$. \\
+		Thus $a_{1} > b_{0}$. \\
+		Also note $b_{1}^{2} = a_{0}b_{0} > b_{0}^{2}$. Since both sides are positive, $b_{1} > b_{0}$. \\
+		Similarly $b_{1}^{2} = a_{0}b_{0} < a_{0}^{2}$. Since both sides are positive, $b_{1} < a_{0}$. \bigbreak
+		
+		We now have $b_{0}<a_{1} < a_{0}$, and $b_{0}<b_{1} < a_{0}$ which will be our base case. \bigbreak
+		
+		Now we assume that $b_{0}<a_{n} < a_{n-1}$, and $b_{n-1}<b_{n}< a_{0}$ for some $n \in \mathbb{N}$.\\
+		Since $a_{0} > b_{n}$, $a_{n+1} = \frac{1}{2} (a_{n}+b_{n}) < \frac{1}{2} (a_{n}+a_{0}) = a_{0}$. \\
+		Thus $a_{1} < a_{0}$. \\
+		
+		\bigbreak
+		
+		By induction we have that $b_{0}<a_{n+1} < a_{n}$, and $b_{n}<b_{n+1}< a_{0}$ for all $n \in \mathbb{N}$. \\
+		 
+	\end{proof}
+
+\end{document}
