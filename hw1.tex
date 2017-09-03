@@ -6,6 +6,9 @@
 \usepackage{amsthm}
 \usepackage{dsfont}
 
+\usepackage{graphicx}
+\graphicspath{ {hw1_images/} }
+
 \pagestyle{fancy}
 \fancyhf{}
 \rhead{Shaw \space \thepage}
@@ -23,9 +26,36 @@ Sep. 9, 2017
 	
 {\large \textbf{HW 1:XXXXXXXX}}\bigbreak
 
+%problem 1.a
+\hspace{-7 ex}\textbf{1 (a)} Write a program that implements the above algorithm. \bigbreak
+	See attached Python code. \bigbreak
+	
+%problem 1.b
+\hspace{-7 ex}\textbf{1 (b) } Run the program with $\epsilon = 10^{−14}$ and report the value of $\tilde{\pi}$ through each iteration of the
+while loop in a nice table. Also report the absolute error in between $\tilde{\pi}$ and $\pi$. \bigbreak
+
+	\begin{center}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			$n$ & $\tilde{\pi}$ & $\vert \tilde{\pi} - \pi \vert$ \\ \hline
+			1 & 3.1876726427121085 & 0.04607998912231537 \\ \hline
+			2 & 3.1416802932976537 & 8.763970786063169e-05 \\ \hline
+			3 & 3.1415926538954473 & 3.056541686419223e-10 \\ \hline
+			4 & 3.141592653589794 & 8.881784197001252e-16 \\ \hline
+		\end{tabular}
+	\end{center}
+	
+
+	
+%problem 1.c
+\hspace{-7 ex}\textbf{1 (c) } Make an appropriate plot of the error verses the iteration number. What type of convergence (linear or super-linear) do you observe? \bigbreak
+
+	\includegraphics[scale=.65]{Figure_1} \\
+	This appears to be super-linear convergence. Note that the error on the 4th and final term is inaccurate due to the precision level. \bigbreak
+
 %problem 1.d
-\hspace{-4 ex}\textbf{1 (d) } Show that for any $a_{0} > b_{0} > 0$ that $\{a_{n}\}$ and $\{b_{n}\}$ converge quadratically to
-	some number which we will call $M(a_{0}, b_{0})$. \\
+\hspace{-7 ex}\textbf{1 (d) } Show that for any $a_{0} > b_{0} > 0$ that $\{a_{n}\}$ and $\{b_{n}\}$ converge quadratically to
+	some number which we will call $M(a_{0}, b_{0})$. \bigbreak
 	
 	\begin{proof}
 		Since $a_{0} > b_{0}$, $a_{1} = \frac{1}{2} (a_{0}+b_{0}) < \frac{1}{2} (a_{0}+a_{0}) = a_{0}$. \\
@@ -96,13 +126,143 @@ Sep. 9, 2017
 			& = \frac{1}{2} \frac{1}{ M + M + 2\sqrt{MM} } \\
 			& = \frac{1}{8M}
 		\end{align*}
-		
 		Since $ a_n - M < a_n - b_n$ we can say that $\{a_n\}$ converges quadratically, and since $b_n - M < b_n - a_n$, we can say that $\{b_n\}$ converges quadratically as well, both with convergence constant $\lambda = \frac{1}{8M}$. \\
-		
-		
-		
-		
-		 
 	\end{proof}
+	
+	\bigbreak
+	
+%problem 1.e
+\hspace{-7 ex}\textbf{1 (e)} (Extra credit: 5 points) Use high precision arithmetic in your AGM method above to obtain π correctly to at least 100 digits. How many total iterations are needed? Estimate the total number needed to reach at least 1000 digits. \bigbreak
+
+	See attached Python code.\bigbreak
+	
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			$n$ & exponent of absolute error \\ \hline
+			1 & -1.33649 \\ \hline
+			2 & -4.05730 \\ \hline
+			3 & -9.51477 \\ \hline
+			4 & -20.42978 \\ \hline
+			5 & -42.25980 \\ \hline
+			6 & -85.91985 \\ \hline
+			7 & -173.23993 \\ \hline
+			8 & -347.88011 \\ \hline
+			9 & -697.16045 \\ \hline
+			10 & -1395.72115 \\ \hline
+			11 & -2000.69897 \\ \hline
+		\end{tabular}
+	\end{center}
+	
+	From the table, we see that it reaches 100 digits of accuracy by the 7th iteration since it has roughly 172 digits of accuracy. This number needs to double 4 times before it is above 2000, so we would expect to achieve this accuracy on the 11th iteration, which is indeed the case. \bigbreak
+	
+%probelm 2
+\hspace{-7 ex}\textbf{2} Problem 2 uses the Taylor Series for $e^x$ \\
+$$ e^x = \lim\limits_{n \to \infty} \sum\limits_{j=0}^{n} \frac{x^j}{j!} $$
+
+\hspace{-7 ex}\textbf{2 (a)} Create a function that computes $e^x$ by truncating the series above to $n$ terms. Using your function for $n = 10$, compute an approximation to $e^x$ for $x = \pm 0.5$ and $x = \pm30\pi$, and report the relative error in your approximation. Repeat these computations for $n = 40$. Comment on your results. \bigbreak
+
+	\begin{center}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			$x$ & $n$ & relative error \\ \hline
+			$0.5$ & 10 & 7.74096e-12 \\ \hline
+			$-0.5$ & 10 & -1.93586e-11 \\ \hline
+			$30\pi$ & 10 & 1.00000e+00 \\ \hline
+			$-30\pi$ & 10 & -1.17500e+54 \\ \hline
+			$0.5$ & 40 & 2.69354e-16 \\ \hline
+			$-0.5$ & 40 & 1.83045e-16 \\ \hline
+			$30\pi$ & 40 & 1.00000e+00 \\ \hline
+			$-30\pi$ & 40 & -6.85301e+71 \\ \hline
+		\end{tabular}
+	\end{center}
+	
+	For $n=10$, the approximation for small $x$ wasn't bad, but hasn't met the maximum precision for standard double point precision. For $n=40$ the accuracy for small $x$ has reached the machine precision accuracy, roughly. \\
+	For large $x$ the relative error is unacceptably large in both cases. \bigbreak
+	
+\hspace{-7 ex}\textbf{2 (b)} By exploiting properties of the exponential, design an algorithm for accurately computing the value of $e^x$ using the series above, for a wide range of $x$ (e.g. $−100 \leq x \leq 100$). This algorithm can only use the basic operations of the computer described above. Create a function for your algorithm and use it, with $n = 10$, for computing approximations to $e^x$ for $x = \pm0.5$ and $x = \pm 30\pi$. \bigbreak
+
+	Since our approximation above is only good for values of $x$ near $0$, we will use the fact that $$e^x=(e^{\frac{x}{1024}})^{1024}$$ to put our input near zero. See the attached Python code for the implementation. \\
+	
+	\begin{center}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			$x$ & $n$ & relative error \\ \hline
+			$0.5$ & 10 & 6.41062e-14 \\ \hline
+			$-0.5$ & 10 & 4.15512e-14 \\ \hline
+			$30\pi$ & 10 & 1.08647e-13 \\ \hline
+			$-30\pi$ & 10 & 7.05012e-14 \\ \hline
+			$0.5$ & 40 & 6.41062e-14 \\ \hline
+			$-0.5$ & 40 & 4.15512e-14 \\ \hline
+			$30\pi$ & 40 & 1.08647e-13 \\ \hline
+			$-30\pi$ & 40 & 7.05012e-14 \\ \hline
+		\end{tabular}
+	\end{center}
+
+\hspace{-7 ex}\textbf{2 (c)} Explain how your algorithm from part (b) can be used for approximating cos$(x)$ and sin$(x)$. \bigbreak
+
+	The simplest way to approximate both sin and cos is to use the fact that $e^{i\theta} = \text{cos}(\theta) + i\text{sin}(\theta)$ and use the same algorithm but implemented with complex numbers. By default, Python recognizes complex numbers and uses the appropriate operation based on the type of number object it is passed. This means that we do not even need to reprogram the algorithm, simply pass in complex values. This method is slower however. A faster way, would be to use the Taylor series for either sin or cos and exploit their cyclic and symetric properties to get the inputs in the range of $0 \leq \theta \leq \frac{\pi}{4}$.
+
+%probelm 3
+\hspace{-7 ex}\textbf{3 (a)} Verify that the following two functions are identical.\\
+	\begin{align*}
+		f(x) & = 1 - \text{tan}(x) \\
+		g(x) & = \frac{\text{cos}2x}{\text{cos}^2x(1+\text{tan}x)} \\
+	\end{align*}
+	
+	\bigbreak
+	
+	We will use the facts that $\text{cos}2x = \text{cos}^2x - \text{sin}^2x$ and that $\text{tan}x = \frac{\text{sin}x}{\text{cos}x}$. \\
+	\begin{align*}
+		g(x) & = \frac{\text{cos}2x}{\text{cos}^2x(1+\text{tan}x)} \\
+		& = \frac{\text{cos}^2x - \text{sin}^2x}{\text{cos}^2x(1+\text{tan}x)} \\
+		& = \frac{1 - \text{tan}^2x}{1+\text{tan}x} \\
+		& = \frac{(1 - \text{tan}x)(1+\text{tan}x)}{1+\text{tan}x} \\
+		& = 1 - \text{tan}x \\
+		& = f(x)
+	\end{align*}
+	
+\hspace{-7 ex}\textbf{3 (b)} Which function should be used when evaluating $x$ near $\frac{\pi}{4}$ and $\frac{5\pi}{4}$ Why?\bigbreak
+
+	Since tan$x$ is close to $1$ for these values, we should use $g(x)$ to avoid the cancellation error in $f(x)$. \\
+
+\hspace{-7 ex}\textbf{3 (c)} Which function should be used when evaluating $x$ near $\frac{3\pi}{4}$ and $\frac{7\pi}{4}$ Why?\bigbreak
+
+	Since tan$x$ is close to $-1$ for these values, we should use $f(x)$ to avoid the cancellation error in the denominator of $g(x)$. \\
+
+%probelm 4
+\hspace{-7 ex}\textbf{4}  \\
+	
+%problem 5
+\hspace{-7 ex}\textbf{5}    Suppose we wish to evaluate the integral \\
+	\begin{equation*}
+			I(N) = \int_{N}^{N+1}\frac{1}{1+x^2}dx
+	\end{equation*}
+	using the analytical result \\
+	\begin{equation}\label{prob2equ3}
+		I(N) = \text{arctan}(N+1) - \text{arctan}(N)
+	\end{equation}
+	
+%problem 5a
+\hspace{-7 ex}\textbf{5 (a)} Explain why (\ref{prob2equ3}) is unacceptable for computations when $N$ is large, e.g. when $N = 10^8$. \bigbreak
+
+	For large values of $N$, $\text{arctan}(N) \approx 1$, and thus $\text{arctan}(N+1) \approx \text{arctan}(N)$ and we get cancellation error when we compute (\ref{prob2equ3}). \bigbreak
+	
+%problem 5b
+\hspace{-7 ex}\textbf{5 (b)} Find some exact way to re-write (\ref{prob2equ3}) in an acceptable form for computation when $N$ is large. \bigbreak
+	
+	We will use the trig identity $$ \text{tan}(x-y) = \frac{\text{tan}(x) - \text{tan}(y)}{1 + \text{tan}(x)\text{tan}(y)}$$ to avoid the subtraction as follows: \\
+	\begin{align}
+		I(N) & = \text{arctan}(N+1) - \text{arctan}(N) \nonumber \\
+		\text{tan}\big(I(N)\big) & = \text{tan}\big(\text{arctan}(N+1) - \text{arctan}(N) \big) \nonumber \\
+		& = \frac{N + 1 - N}{1 + (N+1)(N)} \nonumber \\
+		& = \frac{1}{N^2 + N + 1} \nonumber \\
+		I(N) & = \text{arctan}\bigg(\frac{1}{N^2 + N + 1}\bigg) \label{prob5b}
+	\end{align}
+	
+\hspace{-7 ex}\textbf{5 (c)} Compare your formula in Part b with the formula in (\ref{prob2equ3}) for $N = 10^8$. \bigbreak
+
+	Using formula (\ref{prob2equ3}), we compute that $I(N) = 0$. Using formula (\ref{prob5b}), we compute that $I(N) = 9.9999999*10^{-17}$. \bigbreak
+	
 
 \end{document}

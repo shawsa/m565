@@ -20,8 +20,11 @@ return pi_approx;
 '''
 
 
-from math import sqrt, pi
+from math import sqrt, pi, log, atan, factorial, exp, floor
 from decimal import *
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 pi_102 = Decimal('3.14159265358979323846264338327950288419716939937510582097494459' + '23078164062862089986280348253421170679')
 
@@ -69,6 +72,10 @@ pi_2002 = Decimal('3.14159265358979323846264338327950288419716939937510'+
 '46776465757396241389086583264599581339047802759010')
 
 
+
+# problem 1 **********************************************************************************
+
+
 def pi_approx(epsilon):
     
     pi_approx = []
@@ -107,17 +114,133 @@ def pi_approx_dec(digits):
 
     return pi_approx
 
-def print_hw_output(b_epsilon=1E-14, e_epsilon=2000):
+def print_hw_output_1b(epsilon=1E-14):
     print('(b)')
-    pa = pi_approx(b_epsilon)
-    print('itter', 'approx', 'abs error')
+    pa = pi_approx(epsilon)
+    #latex format
+    print('\t\\begin{center}')
+    print('\t\t\\begin{tabular}{|c|c|c|}')
+    print('\t\t\t\\hline')
+    #print('itter', 'approx', 'abs error')
+    print('\t\t\t$n$ & $\\tilde{\\pi}$ & $\\vert \\tilde{\\pi} - \\pi \\vert$ \\\\ \\hline')
     for i, p in enumerate(pa):
-        print(i+1, p, abs(p - pi))
-
-    pa = pi_approx_dec(e_epsilon)
-    print(i, 'abs error exponent')
+        #print(i+1, p, abs(p - pi))\
+        print('\t\t\t' + str(i+1) + ' & ' + str(p) + ' & ' + str(abs(p - pi)) + ' \\\\ \\hline')
+    print('\t\t\\end{tabular}')
+    print('\t\\end{center}')
+    
+def print_hw_output_1c(epsilon=1E-14):
+    pa = pi_approx(epsilon)
+    n = []
+    error = []
+    for i, p in enumerate(pa):
+        n.append(i+1)
+        error.append(abs(p - pi))
+    plt.semilogy(n, error, 'bo')
+    plt.xlabel('n')
+    plt.ylabel('absolute error')
+    plt.xticks(np.arange(1,len(n)+1,1))
+    plt.show()
+    
+def print_hw_output_1e(epsilon=2000):
+    pa = pi_approx_dec(epsilon)
+    print('n', 'abs error exponent')
     for i,p in enumerate(pa):
         print(i, (abs(p-pi_2002)).log10().quantize(Decimal('.00001')) )
+    #latex format
+    print('\t\\begin{center}')
+    print('\t\t\\begin{tabular}{|c|c|}')
+    print('\t\t\t\\hline')
+    #print('itter', 'approx', 'abs error')
+    print('\t\t\t$n$ & exponent of absolute error \\\\ \\hline')
+    for i, p in enumerate(pa):
+        #print(i+1, p, abs(p - pi))\
+        exponent_error = (abs(p-pi_2002)).log10().quantize(Decimal('.00001'))
+        print('\t\t\t' + str(i+1) + ' & ' + str(exponent_error) + ' \\\\ \\hline')
+    print('\t\t\\end{tabular}')
+    print('\t\\end{center}')
+    
+    
+# problem 2 **********************************************************************************
+
+def e_taylor(x, n):
+    partial_sum = 0
+    for i in range(0,n+1):
+        partial_sum += x**i / factorial(i)
+    return partial_sum
+    
+def e_better_taylor(x,n):
+    ret = e_taylor(x/1024,n)
+    for i in range(10):
+        ret = ret*ret
+    return ret
+    
+def e_cos(theta,n):
+    if theta < 0:
+        theta = theta * -1
         
+    pi_sub = floor(theta/(2*pi))
+    theta = theta - pi*2*pi_sub
+    return e_better_taylor(theta * 1j, n).real
+    
+def e_sin(theta,n):
+    sign = 1
+    
+    if theta < 0:
+        theta = theta * -1
+        sign = -1
+        
+    pi_sub = floor(theta/(2*pi))
+    theta = theta - pi*2*pi_sub
+    return sign * e_better_taylor(theta * 1j, n).imag
+    
+def print_hw_output_2a():
+    xs = [0.5, -0.5, 30*pi, -30*pi] * 2
+    ns = [10]*4 + [40]*4
+    
+    for i, (x, n) in enumerate(zip(xs,ns)):
+        print('{:.4f}'.format(x), n, (exp(x) - e_taylor(x,n)) / exp(x))
+        
+    x_labels = ['$0.5$', '$-0.5$', '$30\pi$', '$-30\pi$'] * 2
+    
+    print('\t\\begin{center}')
+    print('\t\t\\begin{tabular}{|c|c|c|}')
+    print('\t\t\t\\hline')
+    print('\t\t\t$x$ & $n$ & relative error \\\\ \\hline')
+    for i, x in enumerate(xs):
+        rel_error = abs( (exp(x) - e_taylor(x,ns[i])) / exp(x) )
+        print('\t\t\t' + x_labels[i] + ' & ' + str(ns[i])  +  ' & ' + "{:.5e}".format(rel_error) + ' \\\\ \\hline')
+    print('\t\t\\end{tabular}')
+    print('\t\\end{center}')
+    
+
+def print_hw_output_2b():
+    xs = [0.5, -0.5, 30*pi, -30*pi] * 2
+    ns = [10]*4 + [40]*4
+    
+    for i, (x, n) in enumerate(zip(xs,ns)):
+        print('{:.4f}'.format(x), n, (exp(x) - e_taylor(x,n)) / exp(x))
+        
+    x_labels = ['$0.5$', '$-0.5$', '$30\pi$', '$-30\pi$'] * 2
+    
+    print('\t\\begin{center}')
+    print('\t\t\\begin{tabular}{|c|c|c|}')
+    print('\t\t\t\\hline')
+    print('\t\t\t$x$ & $n$ & relative error \\\\ \\hline')
+    for i, x in enumerate(xs):
+        rel_error = abs( (exp(x) - e_better_taylor(x,ns[i])) / exp(x) )
+        print('\t\t\t' + x_labels[i] + ' & ' + str(ns[i])  +  ' & ' + "{:.5e}".format(rel_error) + ' \\\\ \\hline')
+    print('\t\t\\end{tabular}')
+    print('\t\\end{center}')
+   
+    
+    
+    
+# problem 5 **********************************************************************************
+        
+        
+def print_hw_output_5c(N=10**8):
+    print('arctan(N+1) - arctan(N) = ' + str(atan(N+1) - atan(N)) )
+    print('arctan(1/(N**2+N+1) = ' + str( atan(1/(N**2+N+1)) ) )
         
 
