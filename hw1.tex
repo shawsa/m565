@@ -9,6 +9,14 @@
 \usepackage{graphicx}
 \graphicspath{ {hw1_images/} }
 
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,      
+	urlcolor=cyan,
+}
+
 \pagestyle{fancy}
 \fancyhf{}
 \rhead{Shaw \space \thepage}
@@ -24,14 +32,14 @@ m565 - Fall 2017 \\
 Sep. 9, 2017
 \end{flushright}
 	
-{\large \textbf{HW 1:XXXXXXXX}}\bigbreak
+{\large \textbf{HW 1: Problems 1-7}}\bigbreak
 
 %problem 1.a
 \hspace{-7 ex}\textbf{1 (a)} Write a program that implements the above algorithm. \bigbreak
 	See attached Python code. \bigbreak
 	
 %problem 1.b
-\hspace{-7 ex}\textbf{1 (b) } Run the program with $\epsilon = 10^{−14}$ and report the value of $\tilde{\pi}$ through each iteration of the
+\hspace{-7 ex}\textbf{1 (b) } Run the program with $\epsilon = 10^{-14}$ and report the value of $\tilde{\pi}$ through each iteration of the
 while loop in a nice table. Also report the absolute error in between $\tilde{\pi}$ and $\pi$. \bigbreak
 
 	\begin{center}
@@ -231,7 +239,20 @@ $$ e^x = \lim\limits_{n \to \infty} \sum\limits_{j=0}^{n} \frac{x^j}{j!} $$
 	Since tan$x$ is close to $-1$ for these values, we should use $f(x)$ to avoid the cancellation error in the denominator of $g(x)$. \\
 
 %probelm 4
-\hspace{-7 ex}\textbf{4}  \\
+\hspace{-7 ex}\textbf{4}  Suppose $0 < a < b$. Show that if $\alpha_n = \mathcal{O}(1/n^b)$ as $n \to \infty$ then $\alpha_n = \mathcal{O}(1/n^a)$.\bigbreak
+
+	\begin{proof}
+		Since $\alpha_n = \mathcal{O}(1/n^b)$, we can say $\exists C$ such that $\vert \alpha_n \vert \leq C(\frac{1}{n})^b$. \\
+		Note that $(\frac{1}{n})^{b} = (\frac{1}{n})^{b-a} (\frac{1}{n})^{a}$. \\
+		Then \\
+		\begin{align*}
+			\vert \alpha_n \vert & \leq C\Big(\frac{1}{n}\Big)^b \\
+			\vert \alpha_n \vert & \leq C\Big(\frac{1}{n}\Big)^{b-a} \Big(\frac{1}{n}\Big)^{a} \\
+			\vert \alpha_n \vert & \leq \Big(C\frac{1}{n^{b-a}}\Big) \Big(\frac{1}{n}\Big)^{a} \\
+		\end{align*}
+		For any $n>1$, we can say that $\frac{1}{n^{b-a}} < 1$, and finally $$\vert \alpha_n \vert < C \Big(\frac{1}{n}\Big)^{a}$$. \\
+		Thus $\alpha_n = \mathcal{O}(1/n^a)$. \\
+	\end{proof}
 	
 %problem 5
 \hspace{-7 ex}\textbf{5}    Suppose we wish to evaluate the integral \\
@@ -263,6 +284,99 @@ $$ e^x = \lim\limits_{n \to \infty} \sum\limits_{j=0}^{n} \frac{x^j}{j!} $$
 \hspace{-7 ex}\textbf{5 (c)} Compare your formula in Part b with the formula in (\ref{prob2equ3}) for $N = 10^8$. \bigbreak
 
 	Using formula (\ref{prob2equ3}), we compute that $I(N) = 0$. Using formula (\ref{prob5b}), we compute that $I(N) = 9.9999999*10^{-17}$. \bigbreak
+
+
+%probelm 6
+\hspace{-7 ex}\textbf{6 (a)} Implement the cascaded summation function and call it cascsum. \bigbreak
+
+	See attached C code. I attempted to write this in Python, however Python correctly compensated for the error somehow. In \url{https://docs.python.org/3/tutorial/floatingpoint.html} it explains that Python "intelligently" chooses its floating point number representation. I believe that this or something similar is the root of the problem.\\
+
+\hspace{-7 ex}\textbf{6 (b)} Compare the results of your function cascsum to the standard summation algorithm on the following series: \\
+	\begin{equation}\label{6bi}
+		\sum_{j=1}^{1000000}0.000001
+	\end{equation}
+	\begin{equation}\label{6bii}
+		\sum_{j=0}^{99}(0.99)^j
+	\end{equation}
 	
+	\bigbreak
+	
+	See below for the program output. \bigbreak
+	My C program yielded no error for the cascsum for series (\ref{6bi}), and an error of $\approx 7.918*10^{-12}$ for the regular summation. Clearly the cascsum function is more accurate.\bigbreak
+	
+	Note that we can calculate the second series without a repeated summation by using this equation $$ \sum_{j=0}^{N}r^j = \frac{1-r^{N+1}}{1-r}$$ We will compare our sums to this value. For the second series we actually have the same number of correct digits for both the sum and the  cascsum, with the error for the sum being slightly less. If summing 200 terms instead of 100, we can see that the accuracy of the cascsum has surpassed the regular sum. And by 400 terms the accuracy of the cascsum is beyond the precision level of this machine. These results give a somewhat mixed message. It seems that there is a point at which the cascsum becomes more accurate than the regular sum.\\
+	
+	\bigbreak
+	
+	Program output: \\
+	\begin{verbatim}
+	For the first series:
+	The real sum should be 1.
+	Sum     1.0000000000079181
+	Cascsum 1.0000000000000000
+	Sum error:    -7.9181106116266164e-12
+	Cascsum error 0.0000000000000000e+00
+	
+	For the second series:
+	The real sum should be
+	        63.39676587267701535211
+	Sum     63.39676587267700824668
+	Cascsum 63.39676587267702956296
+	Sum error:    7.1054273576010019e-15
+	Cascsum error -1.4210854715202004e-14
+	
+	For the second series taken to 200 terms:
+	The real sum should be
+	86.60203251420374215286
+	Sum     86.60203251420369952029
+	Cascsum 86.60203251420375636371
+	Sum error:    4.2632564145606011e-14
+	Cascsum error -1.4210854715202004e-14
+	
+	For the second series taken to 400 terms:
+	The real sum should be
+	98.20494467249540093690
+	Sum     98.20494467249538672604
+	Cascsum 98.20494467249540093690
+	Sum error:    1.4210854715202004e-14
+	Cascsum error 0.0000000000000000e+00	
+	\end{verbatim}
+
+
+%probelm 7
+\hspace{-7 ex}\textbf{7} Consider the sequence defined by $x_{n+1} = x_n(2-ax_n)$ where $0<x_0<2/a$. It can be shown that this sequence converges to $1/a$.\bigbreak
+
+\hspace{-7 ex}\textbf{7 (a)} Illustrate numerically that the sequence converges to $1/5$ with the choice $x_0 = 0.1$. Display the iterates until the relative error between $x_k$ and $1/5$ is $10^{-15}$ or less. \bigbreak
+
+	See attached Python code. Below is the output.\\
+
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			$n$&$x_n$\\ \hline
+			0&0.1\\ \hline
+			1&0.15000000000000002\\ \hline
+			2&0.18750000000000003\\ \hline
+			3&0.19921875000000003\\ \hline
+			4&0.19999694824218753\\ \hline
+			5&0.1999999999534339\\ \hline
+			6&0.20000000000000004\\ \hline
+		\end{tabular}
+	\end{center}
+	
+\hspace{-7 ex}\textbf{7 (b)} Show mathematically that order of convergence of the sequence to $1/a$ is $2$, and determine $\lambda$. \bigbreak
+
+	We will show this directly \\
+	\begin{proof}
+		See that \\
+		\begin{align*}
+			\lim_{n \to \infty} \frac{\vert x_{n+1} - \frac{1}{a} \vert}{\vert x_n - \frac{1}{a} \vert^2} & = \lim_{n \to \infty} \frac{\vert x_n(2-ax_n) - \frac{1}{a} \vert }{\vert x_n^2 - \frac{2}{a}x_n + \frac{1}{a^2} \vert } \\
+			& = \lim_{n \to \infty} \frac{\vert -ax_n^2 + 2x_n - \frac{1}{a} \vert }{\vert x_n^2 - \frac{2}{a}x_n + \frac{1}{a^2} \vert } \\
+			& = \lim_{n \to \infty} \frac{\vert (-a)(x_n^2 + \frac{2}{a}x_n - \frac{1}{a^2} ) \vert }{\vert x_n^2 - \frac{2}{a}x_n + \frac{1}{a^2} \vert } \\
+			& = a \lim_{n \to \infty} \frac{\vert x_n^2 - \frac{2}{a}x_n + \frac{1}{a^2} \vert }{\vert x_n^2 - \frac{2}{a}x_n + \frac{1}{a^2} \vert } \\
+			& = a \\
+		\end{align*}
+		Thus $\{x_n\}$ converges quadratically with $\lambda = a$. \\
+	\end{proof}
 
 \end{document}

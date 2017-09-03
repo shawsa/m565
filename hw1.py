@@ -19,12 +19,15 @@ return pi_approx;
 
 '''
 
+from pytex import *
 
 from math import sqrt, pi, log, atan, factorial, exp, floor
 from decimal import *
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+#pi to various degrees of accuracy is hard-coded in order to measure error.
 
 pi_102 = Decimal('3.14159265358979323846264338327950288419716939937510582097494459' + '23078164062862089986280348253421170679')
 
@@ -243,4 +246,44 @@ def print_hw_output_5c(N=10**8):
     print('arctan(N+1) - arctan(N) = ' + str(atan(N+1) - atan(N)) )
     print('arctan(1/(N**2+N+1) = ' + str( atan(1/(N**2+N+1)) ) )
         
+        
+# problem 6 **********************************************************************************
+
+# failed to reproduce the error in python. Problem 6 is done in C code instead.
+def cascsum(p):
+    e = 0
+    s = p[0]
+    for i in range(1, len(p)):
+        x = p[i] + s
+        z = x - p[i]
+        y = (p[i] - (x-z)) + (s-z)
+        e += y
+        s = x
+    s += e
+    return s
+    
+
+# problem 7 **********************************************************************************
+
+def division(a, x_0=.1, epsilon=10**-15):
+    x = x_0
+    xs = [x_0]
+    n = 0
+    ns = [n]
+    while abs( (x-(1/a)) *a ) > epsilon:
+        n += 1
+        x *= (2-a*x)
+        ns.append(n)
+        xs.append(x)
+        
+    return (ns,xs)
+    
+def print_hw_output_7():
+    (ns, xs) = division(5)
+    latex_table((ns,xs), ('$n$', '$x_n$'))
+    
+
+
+
+
 
