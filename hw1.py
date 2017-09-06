@@ -1,24 +1,3 @@
-'''
-
-sudo code for algorithm
-
-a = 1;
-b = 1/root(2)
-t = 1/4;
-j = 1;
-while |a − b| ≥ ε do
-y = a;
-a = (a + b)/2;
-b = sqrt(by)
-t = t − j(a − y)**2
-j = 2j;
-pi_approx = a
-2/t;
-end while
-return pi_approx;
-
-'''
-
 from pytex import *
 
 from math import sqrt, pi, log, atan, factorial, exp, floor
@@ -80,41 +59,34 @@ pi_2002 = Decimal('3.14159265358979323846264338327950288419716939937510'+
 
 
 def pi_approx(epsilon):
-    
     pi_approx = []
 
     a = 1
     b = 1/sqrt(2)
     t = 1/4
     j = 1
-    
     while abs(a-b) >= epsilon:
         y = a
         a , b = (a+b)/2 , sqrt(b*y)
         t -= j*(a-y)**2
         j *= 2
         pi_approx.append(a**2/t)
-
     return pi_approx
-
+    
 def pi_approx_dec(digits):
     getcontext().prec = digits+2
     epsilon = Decimal(10)**(-1*digits)
-    
     pi_approx = []
-
     a = Decimal(1)
     b = 1 / Decimal(2).sqrt()
     t = Decimal(1/4)
     j = Decimal(1)
-    
     while abs(a-b) >= epsilon:
         y = a
         a , b = (a+b)/2 , (b*y).sqrt()
         t -= j*(a-y)**2
         j *= 2
         pi_approx.append(a**2/t)
-
     return pi_approx
 
 def print_hw_output_1b(epsilon=1E-14):
@@ -175,7 +147,7 @@ def e_taylor(x, n):
 def e_better_taylor(x,n):
     ret = e_taylor(x/1024,n)
     for i in range(10):
-        ret = ret*ret
+        ret *= ret
     return ret
     
 def e_cos(theta,n):
@@ -204,19 +176,14 @@ def print_hw_output_2a():
     for i, (x, n) in enumerate(zip(xs,ns)):
         print('{:.4f}'.format(x), n, (exp(x) - e_taylor(x,n)) / exp(x))
         
-    x_labels = ['$0.5$', '$-0.5$', '$30\pi$', '$-30\pi$'] * 2
-    
-    print('\t\\begin{center}')
-    print('\t\t\\begin{tabular}{|c|c|c|}')
-    print('\t\t\t\\hline')
-    print('\t\t\t$x$ & $n$ & relative error \\\\ \\hline')
+    x_labels = ['$0.5$', '$-0.5$', '$30\pi$', '$-30\pi$'] * 2  
+    rel_errors = [''] * len(x_labels)
     for i, x in enumerate(xs):
         rel_error = abs( (exp(x) - e_taylor(x,ns[i])) / exp(x) )
-        print('\t\t\t' + x_labels[i] + ' & ' + str(ns[i])  +  ' & ' + "{:.5e}".format(rel_error) + ' \\\\ \\hline')
-    print('\t\t\\end{tabular}')
-    print('\t\\end{center}')
+        rel_errors[i] = "{:.5e}".format(rel_error)
+        
+    latex_table( (x_labels, ns, rel_errors), ('$x$', '$n$', 'relative error'))
     
-
 def print_hw_output_2b():
     xs = [0.5, -0.5, 30*pi, -30*pi] * 2
     ns = [10]*4 + [40]*4
@@ -225,19 +192,12 @@ def print_hw_output_2b():
         print('{:.4f}'.format(x), n, (exp(x) - e_taylor(x,n)) / exp(x))
         
     x_labels = ['$0.5$', '$-0.5$', '$30\pi$', '$-30\pi$'] * 2
-    
-    print('\t\\begin{center}')
-    print('\t\t\\begin{tabular}{|c|c|c|}')
-    print('\t\t\t\\hline')
-    print('\t\t\t$x$ & $n$ & relative error \\\\ \\hline')
+    rel_errors = [''] * len(x_labels)
     for i, x in enumerate(xs):
         rel_error = abs( (exp(x) - e_better_taylor(x,ns[i])) / exp(x) )
-        print('\t\t\t' + x_labels[i] + ' & ' + str(ns[i])  +  ' & ' + "{:.5e}".format(rel_error) + ' \\\\ \\hline')
-    print('\t\t\\end{tabular}')
-    print('\t\\end{center}')
-   
-    
-    
+        rel_errors[i] = "{:.5e}".format(rel_error)
+        
+    latex_table( (x_labels, ns, rel_errors), ('$x$', '$n$', 'relative error'))
     
 # problem 5 **********************************************************************************
         

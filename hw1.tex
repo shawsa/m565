@@ -6,6 +6,18 @@
 \usepackage{amsthm}
 \usepackage{dsfont}
 
+%\usepackage[scaled]{beramono}
+\usepackage{listings}
+\usepackage{courier}
+\lstset{
+	language=Python,
+	showstringspaces=false,
+	formfeed=newpage,
+	tabsize=4,
+	commentstyle=\itshape,
+	basicstyle=\ttfamily,
+}
+
 \usepackage{graphicx}
 \graphicspath{ {hw1_images/} }
 
@@ -34,9 +46,31 @@ Sep. 9, 2017
 	
 {\large \textbf{HW 1: Problems 1-7}}\bigbreak
 
+	Full Python and C code attached at the end of this document. \bigbreak
+
 %problem 1.a
 \hspace{-7 ex}\textbf{1 (a)} Write a program that implements the above algorithm. \bigbreak
-	See attached Python code. \bigbreak
+	See attached Python code. \\
+	Exerpt:
+	
+	\begin{lstlisting}
+		def pi_approx(epsilon):
+			pi_approx = []
+			
+			a = 1
+			b = 1/sqrt(2)
+			t = 1/4
+			j = 1
+			while abs(a-b) >= epsilon:
+				y = a
+				a , b = (a+b)/2 , sqrt(b*y)
+				t -= j*(a-y)**2
+				j *= 2
+				pi_approx.append(a**2/t)
+			return pi_approx
+	\end{lstlisting}
+	
+	\bigbreak
 	
 %problem 1.b
 \hspace{-7 ex}\textbf{1 (b) } Run the program with $\epsilon = 10^{-14}$ and report the value of $\tilde{\pi}$ through each iteration of the
@@ -142,7 +176,28 @@ while loop in a nice table. Also report the absolute error in between $\tilde{\p
 %problem 1.e
 \hspace{-7 ex}\textbf{1 (e)} (Extra credit: 5 points) Use high precision arithmetic in your AGM method above to obtain π correctly to at least 100 digits. How many total iterations are needed? Estimate the total number needed to reach at least 1000 digits. \bigbreak
 
-	See attached Python code.\bigbreak
+	See attached Python code. \\
+	Exerpt: \\
+	
+	\begin{lstlisting}
+	def pi_approx_dec(digits):
+		getcontext().prec = digits+2
+		epsilon = Decimal(10)**(-1*digits)
+		pi_approx = []
+		a = Decimal(1)
+		b = 1 / Decimal(2).sqrt()
+		t = Decimal(1/4)
+		j = Decimal(1)
+		while abs(a-b) >= epsilon:
+			y = a
+			a , b = (a+b)/2 , (b*y).sqrt()
+			t -= j*(a-y)**2
+			j *= 2
+			pi_approx.append(a**2/t)
+		return pi_approx
+	\end{lstlisting}
+	
+	\bigbreak
 	
 	\begin{center}
 		\begin{tabular}{|c|c|}
@@ -170,6 +225,31 @@ $$ e^x = \lim\limits_{n \to \infty} \sum\limits_{j=0}^{n} \frac{x^j}{j!} $$
 
 \hspace{-7 ex}\textbf{2 (a)} Create a function that computes $e^x$ by truncating the series above to $n$ terms. Using your function for $n = 10$, compute an approximation to $e^x$ for $x = \pm 0.5$ and $x = \pm30\pi$, and report the relative error in your approximation. Repeat these computations for $n = 40$. Comment on your results. \bigbreak
 
+	See attached Python code. \\
+	Excerpt: \\
+	
+	\begin{lstlisting}
+def e_taylor(x, n):
+	partial_sum = 0
+	for i in range(0,n+1):
+	partial_sum += x**i / factorial(i)
+	return partial_sum
+	
+def print_hw_output_2a():
+	xs = [0.5, -0.5, 30*pi, -30*pi] * 2
+	ns = [10]*4 + [40]*4
+	for i, (x, n) in enumerate(zip(xs,ns)):
+		print('{:.4f}'.format(x), n, 
+(exp(x) - e_taylor(x,n)) / exp(x))
+	x_labels = ['$0.5$', '$-0.5$', '$30\pi$', '$-30\pi$'] * 2
+	rel_errors = [''] * len(x_labels)
+	for i, x in enumerate(xs):
+		rel_error = abs( (exp(x) - e_taylor(x,ns[i])) / exp(x) )
+		rel_errors[i] = "{:.5e}".format(rel_error)
+	latex_table( (x_labels, ns, rel_errors), ('$x$', '$n$', 
+'relative error'))
+	\end{lstlisting}
+
 	\begin{center}
 		\begin{tabular}{|c|c|c|}
 			\hline
@@ -191,6 +271,29 @@ $$ e^x = \lim\limits_{n \to \infty} \sum\limits_{j=0}^{n} \frac{x^j}{j!} $$
 \hspace{-7 ex}\textbf{2 (b)} By exploiting properties of the exponential, design an algorithm for accurately computing the value of $e^x$ using the series above, for a wide range of $x$ (e.g. $−100 \leq x \leq 100$). This algorithm can only use the basic operations of the computer described above. Create a function for your algorithm and use it, with $n = 10$, for computing approximations to $e^x$ for $x = \pm0.5$ and $x = \pm 30\pi$. \bigbreak
 
 	Since our approximation above is only good for values of $x$ near $0$, we will use the fact that $$e^x=(e^{\frac{x}{1024}})^{1024}$$ to put our input near zero. See the attached Python code for the implementation. \\
+	Excerpt: \\
+	\begin{lstlisting}
+def e_better_taylor(x,n):
+	ret = e_taylor(x/1024,n)
+	for i in range(10):
+		ret *= ret
+	return ret
+		
+def print_hw_output_2b():
+	xs = [0.5, -0.5, 30*pi, -30*pi] * 2
+	ns = [10]*4 + [40]*4
+	for i, (x, n) in enumerate(zip(xs,ns)):
+		print('{:.4f}'.format(x), n, 
+(exp(x) - e_taylor(x,n)) / exp(x))	
+	x_labels = ['$0.5$', '$-0.5$', '$30\pi$', '$-30\pi$'] * 2
+	rel_errors = [''] * len(x_labels)
+	for i, x in enumerate(xs):
+		rel_error = 
+abs( (exp(x) - e_better_taylor(x,ns[i])) / exp(x) )
+		rel_errors[i] = "{:.5e}".format(rel_error)
+	latex_table( (x_labels, ns, rel_errors), 
+('$x$', '$n$', 'relative error'))
+	\end{lstlisting}
 	
 	\begin{center}
 		\begin{tabular}{|c|c|c|}
@@ -289,7 +392,26 @@ $$ e^x = \lim\limits_{n \to \infty} \sum\limits_{j=0}^{n} \frac{x^j}{j!} $$
 %probelm 6
 \hspace{-7 ex}\textbf{6 (a)} Implement the cascaded summation function and call it cascsum. \bigbreak
 
-	See attached C code. I attempted to write this in Python, however Python correctly compensated for the error somehow. In \url{https://docs.python.org/3/tutorial/floatingpoint.html} it explains that Python "intelligently" chooses its floating point number representation. I believe that this or something similar is the root of the problem.\\
+	See attached C code. \\
+	Excerpt: \\
+
+	\begin{lstlisting}[language=C]
+		double cascsum(double p[], int p_len){
+			double e = 0;
+			double s = p[0];
+			double x, z, y;
+			for(int j=1; j<p_len; j++){
+				x = p[j] + s;
+				z = x - p[j];
+				y = (p[j] - (x - z)) + (s - z);
+				e += y;
+				s = x;
+			}
+			return s + e;
+		}
+	\end{lstlisting}	
+	
+	I attempted to write this in Python, however Python correctly compensated for the error somehow. In \url{https://docs.python.org/3/tutorial/floatingpoint.html} it explains that Python "intelligently" chooses its floating point number representation. I believe that this or something similar is the root of the problem.\\
 
 \hspace{-7 ex}\textbf{6 (b)} Compare the results of your function cascsum to the standard summation algorithm on the following series: \\
 	\begin{equation}\label{6bi}
@@ -348,7 +470,28 @@ $$ e^x = \lim\limits_{n \to \infty} \sum\limits_{j=0}^{n} \frac{x^j}{j!} $$
 
 \hspace{-7 ex}\textbf{7 (a)} Illustrate numerically that the sequence converges to $1/5$ with the choice $x_0 = 0.1$. Display the iterates until the relative error between $x_k$ and $1/5$ is $10^{-15}$ or less. \bigbreak
 
-	See attached Python code. Below is the output.\\
+	See attached Python code.
+	Excerpt: \\
+	
+	\begin{lstlisting}
+def division(a, x_0=.1, epsilon=10**-15):
+	x = x_0
+	xs = [x_0]
+	n = 0
+	ns = [n]
+	while abs( (x-(1/a)) *a ) > epsilon:
+		n += 1
+		x *= (2-a*x)
+		ns.append(n)
+		xs.append(x)
+	return (ns,xs)
+
+def print_hw_output_7():
+	(ns, xs) = division(5)
+	latex_table((ns,xs), ('$n$', '$x_n$'))
+	\end{lstlisting}
+	
+	Output:\\
 
 	\begin{center}
 		\begin{tabular}{|c|c|}
