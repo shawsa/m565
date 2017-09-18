@@ -1,0 +1,188 @@
+\documentclass[12pt]{article}
+
+
+% Math		****************************************************************************************
+\usepackage{fancyhdr} 
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{dsfont}
+
+% Macros	****************************************************************************************
+\usepackage{calc}
+
+% Commands	****************************************************************************************
+%\newcommand{\problem}[1]{\hspace{-\widthof{#1}} \textbf{#1}}
+\newcommand{\problem}[1]{\hspace{-4 ex} \large \textbf{#1}\\}
+\newcommand{\reverseconcat}[3]{#3#2#1}
+
+%page		****************************************************************************************
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\doublespacing
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Shaw \space \thepage}
+\setlength\parindent{0pt}
+
+%Code		****************************************************************************************
+\usepackage{listings}
+\usepackage{courier}
+\lstset{
+	language=Python,
+	showstringspaces=false,
+	formfeed=newpage,
+	tabsize=4,
+	commentstyle=\itshape,
+	basicstyle=\ttfamily,
+}
+
+%Images		****************************************************************************************
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
+
+\begin{document}
+	\thispagestyle{empty}
+	
+	\begin{flushright}
+		Sage Shaw \\
+		m565 - Fall 2017 \\
+		\today
+	\end{flushright}
+	
+{\large \textbf{HW 2}}\bigbreak
+
+\problem{1 (a)}\\
+	Code for secant method in python follows:
+	\singlespacing
+	\begin{lstlisting}
+		def secant(f, x0, x1, epsilon=1e-16, n_max=10**5):
+			xs = [x0,x1]
+			xn = x1
+			xn_1 = x0
+			fn = f(xn)
+			fn_1 = f(xn_1)
+			for i in range(n_max):
+				if abs(fn) < epsilon:
+					return xs
+				xn, xn_1 = xn - (xn-xn_1)/(fn-fn_1)*fn, xn
+				fn, fn_1 = f(xn), f(xn_1)
+				xs.append(xn)
+			return None
+	\end{lstlisting}
+	\doublespacing
+	
+\problem{1 (b)}\\
+	Code for Newton's method in python follows:
+	\singlespacing
+	\begin{lstlisting}
+		def newton(f, df, x0, epsilon=1e-16, n_max=10**5):
+			x = x0
+			xs =[x]
+			fx = f(x)
+			dfx = df(x)
+			for i in range(n_max):
+				if abs(fx) < epsilon:
+					return xs
+				x = x - fx/dfx
+				xs.append(x)
+				fx, dfx = f(x), df(x)
+			return None
+	\end{lstlisting}
+	\doublespacing
+\problem{1 (c)}\\
+	The output for the secant method is below.
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			$n$&$x_n$&relative error&rate\\ \hline
+			1&5.5&8.6977255889355&N/A\\ \hline
+			2&5.25&8.256919880347523&N/A\\ \hline
+			3&0.0294863000416&0.948009082466&-0.0252912792622\\ \hline
+			4&0.823978157018&0.452857101461&14.8372523985\\ \hline
+			5&0.593254095941&0.0460391685359&3.88581886785\\ \hline
+			6&0.565982615568&0.00204652838394&2.01139762445\\ \hline
+			7&0.567148753391&9.63245318171e-06&1.86548763383\\ \hline
+			8&0.567143291557&2.02338959262e-09&1.73314683194\\ \hline
+			9&0.56714329041&4.89392647061e-15&1.64601718863\\ \hline
+		\end{tabular}
+	\end{center}
+	It's somewhat difficult to tell with so few iterations, but the rate of convergence appears to be approaching the golden ratio as expected.
+
+	The output for Newton's method is below.
+	\begin{center}
+	    \begin{tabular}{|c|c|c|c|}
+	    	\hline
+	    	$n$&$x_n$&relative error&rate\\ \hline
+	    	1&5.25&8.256919880347523&N/A\\ \hline
+	    	2&0.0326257855847&0.942473469868&-0.0280654002561\\ \hline
+	    	3&0.507891082956&0.104474845169&38.1249608767\\ \hline
+	    	4&0.566496637787&0.00114019267083&3.00005806752\\ \hline
+	    	5&0.56714321473&1.33440892109e-07&2.33593620286\\ \hline
+	    	6&0.56714329041&5.08968352943e-15&2.07911417502\\ \hline
+	    \end{tabular}
+	\end{center}
+    It's somewhat difficult to tell with so few iterations, but it appears to be converging quadratically as expected.
+    
+\problem{2 (a)}
+	Assume that $f$ has a root at $x^*$. Define $\epsilon_n = x^*-x_n$ for each $x_n$. Then $0 = f(x^*) = f(x_n + \epsilon_n)$. By Taylor series expanding around $x_n$ we get that 
+	$$
+	0 = f(x_n + \epsilon_n) \approx f(x_n) + \epsilon_n f^\prime(x_n) + \frac{\epsilon_n^2}{2}f^{\prime\prime}(x_n)
+	$$
+	or equivalently
+	\begin{align}\label{p2a1}
+	\epsilon_n \approx -\frac{f(x_n)}{f^\prime(x_n)} - \frac{\epsilon_n^2f^{\prime\prime}(x_n)}{2f^\prime(x_n)}
+	\end{align}
+	If we then assume that $\epsilon_n^2 \approx 0$, we can say that $\epsilon_n \approx \frac{-f(x_n)}{f^\prime(x_n)}$. Substituting into the right side of (\ref{p2a1}) we get 
+	$$
+	x^* - x_n = \epsilon_n \approx -\frac{f(x_n)}{f^\prime(x_n)} - \frac{f(x_n)^2f^{\prime\prime}(x_n)}{2f^\prime(x_n)^3}
+	$$
+	which gives us the recurrance relation
+	$$
+	x_{n+1} = x_n -\frac{f(x_n)}{f^\prime(x_n)} - \frac{f(x_n)^2f^{\prime\prime}(x_n)}{2f^\prime(x_n)^3}
+	$$
+	
+\problem{2 (b)}
+	\textbf{use computer lab}
+	
+\problem{3 (a)}
+	If $r=1-\frac{x^2}{a}$ then $\sqrt{a} = x(1-r)^{-\frac{1}{2}}$. \\
+	Then the iteration $x_{n+1} = x_n(1-r)^{-\frac{1}{2}}$ where $r=1-\frac{x_n^2}{a}$ will converge in one step. If we Taylor expand $f(r) = (1-r)^{-\frac{1}{2}}$ around $r=0$ we get
+	$$
+	f(r) = (1-r)^{-\frac{1}{2}} \approx 1 + \frac{1}{2}r
+	$$
+	Substituting back $r=1-\frac{x_n^2}{a}$ we get $f(1-\frac{x_n^2}{a}) \approx 1 + \frac{1}{2} (1-\frac{x_n^2}{a}) = \frac{1}{2}(3-\frac{x_n^2}{a})$. Then our iteration becomes $x_{n+1} = \frac{x_n}{2}(3-\frac{x_n^2}{a})$. \\
+	This is essentially using newton's method to calculate the root of $f(r) = (1-r)^{-\frac{1}{2}}$ which will converge quadratically and thus we can expect this recurance to converge quadratically as well. My Python implementation follows.
+	\singlespacing
+	\begin{lstlisting}
+def my_sqrt(a, x0, epsilon=1e-15, n_max=10**5):
+	xs = [x0]
+	x = x0
+	for i in range(n_max):
+		if abs(x**2 - a) < epsilon:
+			return xs
+		x = x/2 * (3 - x**2/a)
+		xs.append(x)
+	return  None
+	\end{lstlisting}\doublespacing
+	
+	The output can be seen below for $a=2$ and $x_0=1$. After a few iterations the number of acurate digits almost doubles at each iteration, consistent with quadratic convergence.
+	
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			$n$&$x_n$&abs err&ratio\\ \hline
+			1&1&0.414213562373&N/A\\ \hline
+			2&1.25&0.164213562373&2.04974089911\\ \hline
+			3&1.38671875&0.0274948123731&1.98925208746\\ \hline
+			4&1.413416936993599&0.000796625379496&1.98542199024\\ \hline
+			5&1.4142128893918142&6.72981280925e-07&1.99177257226\\ \hline
+			6&1.4142135623726146&4.80504525058e-13&1.99583740676\\ \hline
+			7&1.4142135623730951&0.0&N/A\\ \hline
+		\end{tabular}
+	\end{center}
+	
+
+
+\end{document}

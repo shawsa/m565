@@ -1,5 +1,7 @@
 import numpy as np
-
+from pytex import *
+from decimal import *
+from matplotlib import pyplot as plt
 
 
 
@@ -7,36 +9,100 @@ import numpy as np
 
 # Problem 1     ********************************************************************
 
-def secant(f, x0, x1, epsilon=1e-16, n_max=10**9):
-	xs = [x0,x1]
-	xn = x1
-	xn_1 = x0
-	fn = f(xn)
-	fn_1 = f(xn_1)
-	for i in range(n_max):
-		if abs(fn)<epsilon:
-			return xn, i
-		#print(xn)
-		xn, xn_1 = xn - (xn-xn_1)/(fn-fn_1)*fn, xn
-		fn, fn_1 = f(xn), f(xn_1)
-	return None
+def secant(f, x0, x1, epsilon=1e-16, n_max=10**5):
+    xs = [x0,x1]
+    xn = x1
+    xn_1 = x0
+    fn = f(xn)
+    fn_1 = f(xn_1)
+    for i in range(n_max):
+        if abs(fn) < epsilon:
+            return xs
+        xn, xn_1 = xn - (xn-xn_1)/(fn-fn_1)*fn, xn
+        fn, fn_1 = f(xn), f(xn_1)
+        xs.append(xn)
+    return None
 
-def newton(f, df, x0, epsilon=1e-16, n_max=10**9):
-	x = x0
-	fx = f(x)
-	dfx = df(x)
-	for i in range(n_max):
-		if abs(fx) < epsilon:
-			return x, i
-		x = x - fx/dfx
-		fx, dfx = f(x), df(x)
-	return None
+def newton(f, df, x0, epsilon=1e-16, n_max=10**5):
+    x = x0
+    xs =[x]
+    fx = f(x)
+    dfx = df(x)
+    for i in range(n_max):
+        if abs(fx) < epsilon:
+            return xs
+        x = x - fx/dfx
+        xs.append(x)
+        fx, dfx = f(x), df(x)
+    return None
 
 def foo_p1(x):
-	return np.exp(-1*x)-x
+    return np.exp(-1*x)-x
 
 def dfoo_p1(x):
-	return -1*np.exp(-1*x)
+    return -1*np.exp(-1*x)-1
 
 def hw2_p1c():
-	
+    root = 0.56714329040978
+    sec = secant(foo_p1, 5.5, 5.25, epsilon=1e-14)
+    err_rel = []
+    err_ratio = ['N/A']
+    ns = []
+    for i, x in enumerate(sec):
+        err_rel.append(abs(x - root)/root)
+        if i != 0:
+            err_ratio.append(np.log(err_rel[i])/np.log(err_rel[i-1]))
+        ns.append(i+1)
+    latex_table((ns, sec, err_rel, err_ratio), ("$n$", "$x_n$", "relative err", 'ratio'))
+    
+    newt = newton(foo_p1, dfoo_p1, 5.25, epsilon=1e-14)
+    err_rel = []
+    err_ratio = ['N/A']
+    ns = []
+    for i, x in enumerate(newt):
+        err_rel.append(abs(x - root)/root)
+        if i != 0:
+            err_ratio.append(np.log(err_rel[i])/np.log(err_rel[i-1]))
+        ns.append(i+1)
+    latex_table((ns, newt, err_rel, err_ratio), ("$n$", "$x_n$", "relative err", "ratio"))
+    
+# Problem 3     ********************************************************************
+def my_sqrt(a, x0, epsilon=1e-15, n_max=10**5):
+    xs = [x0]
+    x = x0
+    for i in range(n_max):
+        if abs(x**2 - a) < epsilon:
+            return xs
+        x = x/2 * (3 - x**2/a)
+        xs.append(x)
+    return  None
+    
+
+def hw2_p3a():
+    xs = my_sqrt(2, 1)
+    root = np.sqrt(2)
+    err_rel = []
+    err_ratio = ['N/A']
+    ns = []
+    for i, x in enumerate(xs):
+        err_rel.append(abs(x - root))
+        if i != 0:
+            err_ratio.append(np.log(err_rel[i])/np.log(err_rel[i-1]))
+        ns.append(i+1)
+    latex_table((ns, xs, err_rel, err_ratio), ("$n$", "$x_n$", "abs err", 'ratio'))
+    
+def foo_3(x,a):
+    return .5*(x + a/x)
+def ident(x):
+    return x
+      
+def hw2_p3b():
+    xs = np.linspace(-.1,3,1000)
+    ys = np.vectorize(foo_3)(xs,2)
+    ys_1 = np.vectorize(ident)(xs)
+    plt.plot(xs,ys, 'b-')
+    plt.plot(xs,ys_1, 'r-')
+    plt.show()
+    
+    
+    
