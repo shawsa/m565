@@ -96,23 +96,41 @@ def foo_3(x,a):
     return .5*(x + a/x)
 def foo_4(x,a):
     return x/2 * (3-x**2/a)
+
+def fixed_point(x0, foo, a, n):
+    xs  = [x0]
+    ys = [-100]
+    for i in range(n-1):
+        xs.append(xs[-1])
+        ys.append(foo(xs[-1],a))
+        xs.append(ys[-1])
+        ys.append(xs[-1])
+    return xs, ys
       
 def hw2_p3b():
     xs = np.linspace(-.1,10,1000)
     ys = np.vectorize(foo_3)(xs,2)
     plt.plot(xs,ys, 'b-')
     plt.plot(xs,xs, 'r-')
+    fp_xs, fp_ys = fixed_point(.2, foo_3, 2, 10)
+    plt.plot(fp_xs, fp_ys, 'g-')
+    fp_xs, fp_ys = fixed_point(8.5, foo_3, 2, 10)
+    plt.plot(fp_xs, fp_ys, 'y-')
     plt.xlim(0, 10)
     plt.ylim(0,10)
-    #plt.show()
+    plt.show()
     
     xs = np.linspace(-2,5,1000)
     ys = np.vectorize(foo_4)(xs,2)
     plt.plot(xs,ys, 'b-')
     plt.plot(xs,xs, 'r-')
+    fp_xs, fp_ys = fixed_point(.2, foo_4, 2, 10)
+    plt.plot(fp_xs, fp_ys, 'g-')
+    fp_xs, fp_ys = fixed_point(2.5, foo_4, 2, 10)
+    plt.plot(fp_xs, fp_ys, 'y-')
     plt.xlim(-2, 5)
     plt.ylim(-2,5)
-    #plt.show()
+    plt.show()
     
     #check for convergence
     starts = [.0001, 1, 2, 4, 100]
