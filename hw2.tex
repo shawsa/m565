@@ -57,19 +57,19 @@
 	Code for secant method in python follows:
 	\singlespacing
 	\begin{lstlisting}
-		def secant(f, x0, x1, epsilon=1e-16, n_max=10**5):
-			xs = [x0,x1]
-			xn = x1
-			xn_1 = x0
-			fn = f(xn)
-			fn_1 = f(xn_1)
-			for i in range(n_max):
-				if abs(fn) < epsilon:
-					return xs
-				xn, xn_1 = xn - (xn-xn_1)/(fn-fn_1)*fn, xn
-				fn, fn_1 = f(xn), f(xn_1)
-				xs.append(xn)
-			return None
+def secant(f, x0, x1, epsilon=1e-16, n_max=10**5):
+	xs = [x0,x1]
+	xn = x1
+	xn_1 = x0
+	fn = f(xn)
+	fn_1 = f(xn_1)
+	for i in range(n_max):
+		if abs(fn) < epsilon:
+			return xs
+		xn, xn_1 = xn - (xn-xn_1)/(fn-fn_1)*fn, xn
+		fn, fn_1 = f(xn), f(xn_1)
+		xs.append(xn)
+	return None
 	\end{lstlisting}
 	\doublespacing
 	
@@ -77,18 +77,18 @@
 	Code for Newton's method in python follows:
 	\singlespacing
 	\begin{lstlisting}
-		def newton(f, df, x0, epsilon=1e-16, n_max=10**5):
-			x = x0
-			xs =[x]
-			fx = f(x)
-			dfx = df(x)
-			for i in range(n_max):
-				if abs(fx) < epsilon:
-					return xs
-				x = x - fx/dfx
-				xs.append(x)
-				fx, dfx = f(x), df(x)
-			return None
+def newton(f, df, x0, epsilon=1e-16, n_max=10**5):
+	x = x0
+	xs =[x]
+	fx = f(x)
+	dfx = df(x)
+	for i in range(n_max):
+		if abs(fx) < epsilon:
+			return xs
+		x = x - fx/dfx
+		xs.append(x)
+		fx, dfx = f(x), df(x)
+	return None
 	\end{lstlisting}
 	\doublespacing
 \problem{1 (c)}\\
@@ -152,8 +152,7 @@
 	$$
 	f(r) = (1-r)^{-\frac{1}{2}} \approx 1 + \frac{1}{2}r
 	$$
-	Substituting back $r=1-\frac{x_n^2}{a}$ we get $f(1-\frac{x_n^2}{a}) \approx 1 + \frac{1}{2} (1-\frac{x_n^2}{a}) = \frac{1}{2}(3-\frac{x_n^2}{a})$. Then our iteration becomes $x_{n+1} = \frac{x_n}{2}(3-\frac{x_n^2}{a})$. \\
-	This is essentially using newton's method to calculate the root of $f(r) = (1-r)^{-\frac{1}{2}}$ which will converge quadratically and thus we can expect this recurance to converge quadratically as well. My Python implementation follows.
+	Substituting back $r=1-\frac{x_n^2}{a}$ we get $f(1-\frac{x_n^2}{a}) \approx 1 + \frac{1}{2} (1-\frac{x_n^2}{a}) = \frac{1}{2}(3-\frac{x_n^2}{a})$. Then our iteration becomes $x_{n+1} = \frac{x_n}{2}(3-\frac{x_n^2}{a})$. This is essentially using newton's method to calculate the root of $f(r) = (1-r)^{-\frac{1}{2}}$ which will converge quadratically and thus we can expect this recurance to converge quadratically as well. My Python implementation follows.
 	\singlespacing
 	\begin{lstlisting}
 def my_sqrt(a, x0, epsilon=1e-15, n_max=10**5):
@@ -167,7 +166,7 @@ def my_sqrt(a, x0, epsilon=1e-15, n_max=10**5):
 	return  None
 	\end{lstlisting}\doublespacing
 	
-	The output can be seen below for $a=2$ and $x_0=1$. After a few iterations the number of acurate digits almost doubles at each iteration, consistent with quadratic convergence.
+	The output can be seen below for $a=2$ and $x_0=1$. After a few iterations the number of accurate digits almost doubles at each iteration, consistent with quadratic convergence.
 	
 	\begin{center}
 		\begin{tabular}{|c|c|c|c|}
@@ -183,6 +182,96 @@ def my_sqrt(a, x0, epsilon=1e-15, n_max=10**5):
 		\end{tabular}
 	\end{center}
 	
+\problem{3 (b)}
+	In Figure 1 can be seen equation (3) from the homework: $y=\frac{1}{2}(x+\frac{a}{x})$.
+	\begin{figure}[h]
+		\caption{$y=\frac{1}{2}(x+\frac{a}{x})$ and $y=x$}
+		\centering
+		\includegraphics[width=0.5\textwidth]{hw2_figure_1}
+	\end{figure}\\
+	Note, that for a square-root, only a positive valued initial guess is appropriate. From the graph, one would expect that all choices of starting point will converge. The table below confirms this suspicion. 
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			$x_0$&converged\\ \hline
+			0.0001&1.414213562373095\\ \hline
+			1&1.414213562373095\\ \hline
+			2&1.414213562373095\\ \hline
+			4&1.414213562373095\\ \hline
+			100&1.414213562373095\\ \hline
+		\end{tabular}
+	\end{center}
+	
+	In Figure 2 can be seen equation (4): $y=\frac{x}{2}(3-\frac{x^2}{a})$.
+	\begin{figure}[h]
+		\caption{$y=\frac{x}{2}(3-\frac{x^2}{a})$ and $y=x$}
+		\centering
+		\includegraphics[width=0.5\textwidth]{hw2_figure_2}
+	\end{figure}
+	
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			$x_0$&converged\\ \hline
+			-100&249850.0\\ \hline
+			-10&-3244116.25\\ \hline
+			-5&9094925797.771563\\ \hline
+			-1.82674185835&-1.41421356237\\ \hline
+			-1.82474185835&-1.41421356237\\ \hline
+			-1&-1.414213562373095\\ \hline
+			-0.01&-1.4142135623730951\\ \hline
+			0.01&1.4142135623730951\\ \hline
+			1&1.414213562373095\\ \hline
+			1.82474185835&1.41421356237\\ \hline
+			1.82674185835&1.41421356237\\ \hline
+			2&1.414213562373095\\ \hline
+			5&-9094925797.771563\\ \hline
+			10&3244116.25\\ \hline
+			100&-249850.0\\ \hline
+		\end{tabular}
+	\end{center}
+	
+\problem{3 (c)}
+	Notice that similarly to above, $\frac{1}{\sqrt{a}}=x(1-r)^{-\frac{1}{2}}$ where $r=1-ax^2$ is an identity for any positive value of $x$. We then Taylor expand the function $f(r)=(1-r)^{-\frac{1}{2}}$ about $r=0$ to get the following
+	$$
+	f(r) \approx 1 + \frac{1}{2}r + \frac{3}{8}r^2
+	$$
+	Substituting $r=1-ax^2$ we get
+	\begin{align*}
+		f(1-ax^2) & \approx 1 + \frac{1}{2}(1-ax^2) + \frac{3}{8}(1-ax^2)^2\\
+		& \approx 1 + \frac{1}{2} - \frac{a}{2}x^2 + \frac{3}{8}(1-2ax^2 + a^2x^4) \\
+		& \approx 1 + \frac{1}{2} - \frac{a}{2}x^2 + \frac{3}{8} -\frac{6}{8}ax^2 + \frac{3}{8}a^2x^4) \\
+		& \approx \frac{15}{8} - \frac{10}{8}ax^2 + \frac{3}{8}a^2x^4\\
+		& \approx \frac{1}{8}(15 - 10ax^2 + 3a^2x^4)\\
+		& \approx \frac{1}{8}(15 - ax^2(10 - 3ax^2))
+	\end{align*}
+	Then our iteration becomes
+	\begin{align*}
+		x_{n+1} & = x_nf(1-ax_n^2) \\
+		x_{n+1} & = \frac{x_n}{8}(15 - ax_n^2(10 - 3ax_n^2))
+	\end{align*}
+	as desired. \textbf{explain why cubicly convergent} \\
+	
+	
+	
+	
+	
+\problem{6} 
+	Suppose we have a function $f(x)$, such that for any $x_0$, an iteration of Newton's method returns $-x_0$. That is 
+	$$
+	-x_0 = x_0 - \frac{f(x)}{f^\prime(x)}
+	$$
+	It then follows that $2x_0 = \frac{f(x)}{f^\prime(x)}$. Letting $f(x)=y$, we can then manipulate it as follows
+	\begin{align*}
+		\frac{1}{y}\frac{dy}{dx} & = \frac{1}{2x} \\
+		\int \frac{1}{y}\frac{dy}{dx} dx & = \int \frac{1}{2x} dx \\
+		\int \frac{1}{y}dy & = \frac{1}{2}\int \frac{1}{x} dx \\
+		ln\vert y \vert & = \frac{1}{2} ln\vert x \vert + C_0 \\
+		ln\vert y \vert & = ln\vert x \vert^\frac{1}{2} + C_0 \\
+		\vert y \vert & = C_1 \vert x \vert^\frac{1}{2} \\
+		y & = \pm C_1 \sqrt{\vert x \vert} \\
+	\end{align*}
+	Noticing that the derivative is undefined at $x=0$ we allow for separate solutions when $x$ is either positive or negative. When checking it is quickly shown that $f(x)=C_1 \text{sign}(x)\sqrt{\vert x \vert}$.
 
 
 \end{document}
