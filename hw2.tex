@@ -252,8 +252,78 @@ def my_sqrt(a, x0, epsilon=1e-15, n_max=10**5):
 	\end{align*}
 	as desired. \textbf{explain why cubicly convergent} \\
 	
+
+\problem{5 (a)}
+	From the table below it can be seen that that the iteration occilates between 0.9948 and 0.0117. Obviously niether of these are a solution to our problem since the next iteration returns the other number for each.
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			$n$&$x_n$\\ \hline
+			1&0\\ \hline
+			2&0.9953222650189527\\ \hline
+			3&0.010556209425946548\\ \hline
+			4&0.9948670503002457\\ \hline
+			\vdots & \vdots \\ \hline
+			26&0.9948153975507391\\ \hline
+			27&0.011699975456613668\\ \hline
+			28&0.9948153975507384\\ \hline
+			29&0.011699975456615172\\ \hline
+			30&0.9948153975507384\\ \hline
+		\end{tabular}
+	\end{center}
 	
+\problem{5 (b)}
+	Python implementation of Steffenson's iterative method:
+	\singlespacing
+	\begin{lstlisting}
+def foo_6(x):
+	return -1*erf(2*(x-1))
 	
+def hw2_p5b():
+	xs = [0]
+	x = 0
+	ns = [0]
+	#perform first iteration so that error checking can compute
+	g = foo_6(x)
+	x = x - (g-x)**2/(foo_6(g) -2*g + x)
+	xs.append(x)
+	for i in range(1,1000000): 
+		if abs(xs[-1] - xs[-2]) < 1e-15:
+			break
+		g = foo_6(x)
+		if abs((foo_6(g) -2*g + x)) < 1e-15:
+			break
+		x = x - (g-x)**2/(foo_6(g) -2*g + x)
+		xs.append(x)
+		ns.append(i)
+	latex_table((ns, xs),('$n$', '$x_n$'))
+	\end{lstlisting}
+	\doublespacing
+	Iterations of Steffenson's iterative method are in the the table below.
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			$n$&$x_n$\\ \hline
+			0&0\\ \hline
+			1&0.5003142541320008\\ \hline
+			2&0.6395901752177244\\ \hline
+			3&0.661032522348998\\ \hline
+			4&0.6615598346647998\\ \hline
+			5&0.6615601506706955\\ \hline
+			6&0.661560150670809\\ \hline
+		\end{tabular}
+	\end{center}
+
+\problem{5 (c)}
+	From the fundamental theorem of calculus 
+	$$
+	\frac{d}{dx}\text{erf}(x) = \frac{d}{dx}\frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}dt = \frac{2}{\sqrt{\pi}} e^{-x^2}
+	$$
+	Using this and applying the chain rule, we arive at the derivative of $g(x) = -\text{erf}(2(x-1))$ \\
+	$$
+	g^\prime(x) = -\frac{4}{\sqrt{\pi}} e^{-x^2}
+	$$
+	Evaluating at our fixed point $x^* = 0.661560150670809$ we obtain $g(x^*) = -1.4272696617560152$. Since the magnitude of this derivative is not less than 1, we are not guaranteed convergence by the Fixed Point theorem.
 	
 	
 \problem{6} 

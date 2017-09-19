@@ -2,6 +2,7 @@ import numpy as np
 from pytex import *
 from decimal import *
 from matplotlib import pyplot as plt
+from math import erf, pi, sqrt, exp
 
 
 
@@ -163,4 +164,49 @@ def hw2_p3c():
         ns.append(i+1)
     latex_table((ns, xs, err_rel, err_ratio), ("$n$", "$x_n$", "abs err", 'ratio'))
     
+    
+# Problem 5     ********************************************************************
+
+def foo_6(x):
+    return -1*erf(2*(x-1))
+def dfoo_6(x):
+    return -4/sqrt(pi)*exp(-4*(x-1)**2)
+
+def hw2_p5a():
+    xs = [0]
+    x = 0
+    for i in range(30):
+        x = foo_6(x)
+        xs.append(x)
+    latex_table((range(1,31), xs),('$n$', '$x_n$'))
+    
+def hw2_p5b():
+    getcontext().prec = 30
+    xs = [0]
+    x = 0
+    ns = [0]
+    #perform first iteration so that error checking can compute
+    g = foo_6(x)
+    x = x - (g-x)**2/(foo_6(g) -2*g + x)
+    xs.append(x)
+    for i in range(1,1000000): 
+        if abs(xs[-1] - xs[-2]) < 1e-15:
+            break
+        g = foo_6(x)
+        if abs((foo_6(g) -2*g + x)) < 1e-15:
+            break
+        print(x)
+        x = x - (g-x)**2/(foo_6(g) -2*g + x)
+        xs.append(x)
+        ns.append(i)
+    ns.append(ns[-1]+1)
+    xs.append(foo_6(x))
+        
+    latex_table((ns, xs),('$n$', '$x_n$'))
+    #part c
+    print(dfoo_6(xs[-1]))
+
+
+
+
     
