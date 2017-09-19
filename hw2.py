@@ -4,10 +4,6 @@ from decimal import *
 from matplotlib import pyplot as plt
 from math import erf, pi, sqrt, exp
 
-
-
-
-
 # Problem 1     ********************************************************************
 
 def secant(f, x0, x1, epsilon=1e-16, n_max=10**5):
@@ -101,6 +97,8 @@ def fixed_point(x0, foo, a, n):
     xs  = [x0]
     ys = [-100]
     for i in range(n-1):
+        if abs(xs[-1]) > 1000:
+            break
         xs.append(xs[-1])
         ys.append(foo(xs[-1],a))
         xs.append(ys[-1])
@@ -120,19 +118,39 @@ def hw2_p3b():
     plt.ylim(0,10)
     plt.show()
     
-    xs = np.linspace(-2,5,1000)
+    xs = np.linspace(-10,10,1000)
     ys = np.vectorize(foo_4)(xs,2)
     plt.plot(xs,ys, 'b-')
     plt.plot(xs,xs, 'r-')
     fp_xs, fp_ys = fixed_point(.2, foo_4, 2, 10)
     plt.plot(fp_xs, fp_ys, 'g-')
-    fp_xs, fp_ys = fixed_point(2.5, foo_4, 2, 10)
+    fp_xs, fp_ys = fixed_point(3, foo_4, 2, 10)
+    plt.plot(fp_xs, fp_ys, 'c-')
+    fp_xs, fp_ys = fixed_point(2, foo_4, 2, 10)
+    plt.plot(fp_xs, fp_ys, 'm-')
+    fp_xs, fp_ys = fixed_point(3.1, foo_4, 2, 10)
     plt.plot(fp_xs, fp_ys, 'y-')
-    plt.xlim(-2, 5)
-    plt.ylim(-2,5)
+    fp_xs, fp_ys = fixed_point(3.2, foo_4, 2, 10)
+    plt.plot(fp_xs, fp_ys, 'k-')
+    plt.xlim(-5, 5)
+    plt.ylim(-5,5)
     plt.show()
     
     #check for convergence
+    xs = []
+    converges = []
+    for x0 in np.arange(-4,4,.1):
+        fp_xs, fp_ys = fixed_point(x0, foo_4, 2, 10000)
+        xs.append(x0)
+        if abs(fp_xs[-1] - fp_xs[-2]) < 1e-10:
+            converges.append(fp_xs[-1])
+        else:
+            converges.append('diverges')
+    latex_table((xs, converges), ('$x0$', 'converges to'))
+    
+    
+    
+    
     starts = [.0001, 1, 2, 4, 100]
     ends = []
     epsilon = 1e-13

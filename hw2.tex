@@ -252,9 +252,33 @@ def my_sqrt(a, x0, epsilon=1e-15, n_max=10**5):
 	\end{align*}
 	as desired. \textbf{explain why cubicly convergent} \\
 	
+	\singlespacing
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			$x0$&converges to\\ \hline
+			-3.2&diverges\\ \hline
+			-3.1&-1.41421356237\\ \hline
+			-3.0&1.41421356237\\ \hline
+			-2.9&1.41421356237\\ \hline
+			-2.5&1.41421356237\\ \hline
+			-2.4&-1.41421356237\\ \hline
+			-0.1&-1.41421356237\\ \hline
+			0.1&1.41421356237\\ \hline
+			2.4&1.41421356237\\ \hline
+			2.5&-1.41421356237\\ \hline
+			3.0&-1.41421356237\\ \hline
+			3.1&1.41421356237\\ \hline
+			3.2&diverges\\ \hline
+			3.3&diverges\\ \hline
+		\end{tabular}
+	\end{center}
+	\doublespacing
+	
 
 \problem{5 (a)}
 	From the table below it can be seen that that the iteration occilates between 0.9948 and 0.0117. Obviously niether of these are a solution to our problem since the next iteration returns the other number for each.
+	\singlespacing
 	\begin{center}
 		\begin{tabular}{|c|c|}
 			\hline
@@ -271,6 +295,7 @@ def my_sqrt(a, x0, epsilon=1e-15, n_max=10**5):
 			30&0.9948153975507384\\ \hline
 		\end{tabular}
 	\end{center}
+	\doublespacing
 	
 \problem{5 (b)}
 	Python implementation of Steffenson's iterative method:
@@ -283,7 +308,8 @@ def hw2_p5b():
 	xs = [0]
 	x = 0
 	ns = [0]
-	#perform first iteration so that error checking can compute
+	#perform first iteration so that 
+#error checking can compute
 	g = foo_6(x)
 	x = x - (g-x)**2/(foo_6(g) -2*g + x)
 	xs.append(x)
