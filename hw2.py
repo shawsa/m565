@@ -164,7 +164,7 @@ def hw2_p3b():
         ends.append(x)
     latex_table((starts, ends), ('$x_0$', 'converged'))
     
-    starts = [-100, -10, -5, -1*np.sqrt(10/3)-.001, -1*np.sqrt(10/3)+.001,-1, -.01, .01,1, 1*np.sqrt(10/3)-.001, 1*np.sqrt(10/3)+.001, 1.999,2, 2.001 ,3,3.1, 3.15, 3.2, 3.4, 3.5,3.6,3.7,3.84,5, 10, 100]
+    starts = [0, .01,1, np.sqrt(2), 2, np.sqrt(6)-.001, 1*np.sqrt(6)+.001]
     ends = []
     for x0 in starts:
         x = x0
@@ -242,7 +242,39 @@ def hw2_p5b():
     #part c
     print(dfoo_6(xs[-1]))
 
-
-
-
     
+# Problem 7     ********************************************************************
+ 
+def foo_7(x):
+    return np.exp(x) - 1
+    
+def fixed_point_7(x0, foo, n):
+    xs  = [x0]
+    ys = [-100]
+    for i in range(n-1):
+        if abs(xs[-1]) > 1000:
+            break
+        xs.append(xs[-1])
+        ys.append(foo(xs[-1]))
+        xs.append(ys[-1])
+        ys.append(xs[-1])
+    return xs, ys
+    
+def hw2_p7a():
+    xs = np.linspace(-10,10,1000)
+    ys = foo_7(xs)
+    plt.plot(xs,ys, 'b-')
+    plt.plot(xs,xs, 'r-')
+    fp_xs, fp_ys = fixed_point_7(.2, foo_7, 10)
+    plt.plot(fp_xs, fp_ys, 'g-')
+    fp_xs, fp_ys = fixed_point_7(.1, foo_7, 10)
+    plt.plot(fp_xs, fp_ys, 'y-')
+    fp_xs, fp_ys = fixed_point_7(-.1, foo_7, 10)
+    plt.plot(fp_xs, fp_ys, 'c-')
+    fp_xs, fp_ys = fixed_point_7(-2, foo_7, 10)
+    plt.plot(fp_xs, fp_ys, 'm-')
+    fp_xs, fp_ys = fixed_point_7(-5, foo_7, 10)
+    plt.plot(fp_xs, fp_ys, 'k-')
+    plt.xlim(-5, 5)
+    plt.ylim(-5,5)
+    plt.show()
