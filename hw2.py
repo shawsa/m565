@@ -2,7 +2,7 @@ import numpy as np
 from pytex import *
 from decimal import *
 from matplotlib import pyplot as plt
-from math import erf, pi, sqrt, exp
+from math import erf, pi, sqrt, exp, ceil
 
 # Problem 1     ********************************************************************
 
@@ -278,3 +278,32 @@ def hw2_p7a():
     plt.xlim(-5, 5)
     plt.ylim(-5,5)
     plt.show()
+    
+def pred_n(epsilon, x0):
+    return 2/epsilon - 2/x0
+    
+def hw2_p7b():
+    eps = [1e-4, 1e-5, 1e-6]*3
+    x0s = [-.1]*3 + [-.01]*3 + [-.001]*3
+    pred = []
+    actual = []
+    for e, x0 in zip(eps, x0s):
+        pred.append( ceil( pred_n(e,x0) ) )
+        x = x0
+        for i in range(pred[-1]*2):
+            if x > -1*e:
+                actual.append(i)
+                break
+            x = foo_7(x)
+        else:
+            actual.append('>2*predicted')
+    rel_errors = []
+    for p, a in zip(pred, actual):
+        if a == '>2*predicted':
+            rel_errors.append(' ')
+        else:
+            rel_errors.append('{:0.2f}\\%'.format(100*(p-a)/a))
+    latex_table((eps, x0s, pred, actual, rel_errors), ('$\epsilon$', '$x_0$', '$n$ predicted', '$n$ actual', 'relative error'))
+        
+    
+    

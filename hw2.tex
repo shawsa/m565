@@ -65,7 +65,7 @@ def secant(f, x0, x1, epsilon=1e-16, n_max=10**5):
 	fn_1 = f(xn_1)
 	for i in range(n_max):
 		if abs(fn) < epsilon:
-			return xs
+			return xs[-1], len(xs)
 		xn, xn_1 = xn - (xn-xn_1)/(fn-fn_1)*fn, xn
 		fn, fn_1 = f(xn), f(xn_1)
 		xs.append(xn)
@@ -84,7 +84,7 @@ def newton(f, df, x0, epsilon=1e-16, n_max=10**5):
 	dfx = df(x)
 	for i in range(n_max):
 		if abs(fx) < epsilon:
-			return xs
+			return xs[-1], len(xs)
 		x = x - fx/dfx
 		xs.append(x)
 		fx, dfx = f(x), df(x)
@@ -144,7 +144,7 @@ def newton(f, df, x0, epsilon=1e-16, n_max=10**5):
 	$$
 	
 \problem{2 (b)}
-	Below can be seen the output of a session of Maple. The first two lines verify that Newton's method is quadratically convergent since the output is $\mathcal{O}(x^2)$. The next two lines verify that our modified Newton's method is cubically convergent since the output is $\mathcal{O}(x^2)$.
+	Below can be seen the output of a session of Maple. The first two lines verify that Newton's method is quadratically convergent since the error term is $\mathcal{O}(x^3)$. The next two lines verify that our modified Newton's method is cubically convergent since the error term is $\mathcal{O}(x^4)$.
 	
 	\begin{figure}[h]
 		\caption{Maple output}
@@ -158,7 +158,7 @@ def newton(f, df, x0, epsilon=1e-16, n_max=10**5):
 	$$
 	f(r) = (1-r)^{-\frac{1}{2}} \approx 1 + \frac{1}{2}r
 	$$
-	Substituting back $r=1-\frac{x_n^2}{a}$ we get $f(1-\frac{x_n^2}{a}) \approx 1 + \frac{1}{2} (1-\frac{x_n^2}{a}) = \frac{1}{2}(3-\frac{x_n^2}{a})$. Then our iteration becomes $x_{n+1} = \frac{x_n}{2}(3-\frac{x_n^2}{a})$. This is essentially using newton's method to calculate the root of $f(r) = (1-r)^{-\frac{1}{2}}$ which will converge quadratically and thus we can expect this recurance to converge quadratically as well. My Python implementation follows.
+	Substituting back $r=1-\frac{x_n^2}{a}$ we get $f(1-\frac{x_n^2}{a}) \approx 1 + \frac{1}{2} (1-\frac{x_n^2}{a}) = \frac{1}{2}(3-\frac{x_n^2}{a})$. Then our iteration becomes $x_{n+1} = \frac{x_n}{2}(3-\frac{x_n^2}{a})$. This is iterating on the function $y=\frac{3}{2}x - \frac{1}{2a}x^3$. Note that the derivative is $y^\prime = \frac{3}{2} - \frac{3}{2a}x^2$ and it is easy to see that $y^\prime(\sqrt{a}) = 0$. Since the derivative is zero at our roo, we will get quadratic convergence. My Python implementation follows.
 	\singlespacing
 	\begin{lstlisting}
 def my_sqrt(a, x0, epsilon=1e-15, n_max=10**5):
@@ -214,7 +214,7 @@ def my_sqrt(a, x0, epsilon=1e-15, n_max=10**5):
 		\centering
 		\includegraphics[width=.75\textwidth]{hw2_figure_2}
 	\end{figure}
-	From the figure it is clear that a choice of $x_0 \in (0,\sqrt{2})$ will converge to $\sqrt{2}$. Also, after that interval there is a short interval where the first iteration gets mapped into $(0,\sqrt{2})$. So $x_0 \in (0,\sqrt{6})$ will converge to $\sqrt{2}$. This can be seen numerically in the table below.
+	From the figure it is clear that a choice of $x_0 \in (0,\sqrt{2})$ will converge to $\sqrt{2}$. Also, after that interval there is a short interval where the first iteration gets mapped into $(0,\sqrt{2})$ The function has a root at $\sqrt{6}$ so $x_0 \in (0,\sqrt{6})$ will converge to $\sqrt{2}$. This can be seen numerically in the table below.
 	
 	\singlespacing
 	\begin{center}
@@ -254,17 +254,35 @@ def my_sqrt(a, x0, epsilon=1e-15, n_max=10**5):
 		x_{n+1} & = x_nf(1-ax_n^2) \\
 		x_{n+1} & = \frac{x_n}{8}(15 - ax_n^2(10 - 3ax_n^2))
 	\end{align*}
-	as desired. This is essentially our modified Newton's method from problem 2 (since we continue the Taylor expansion to the third term) which is cubically convergent.
+	as desired. The implied function is $y=\frac{1}{8}(15x - 10ax^3 + 3a^2x^5)$. Note its derivatives $y^\prime = \frac{1}{8}(15 - 30ax^2 + 15a^2x^4)$ and $y^{\prime\prime} = \frac{1}{8}(-60ax + 60a^2x^3)$. We can see that
+	
+	\begin{align*}
+		y^\prime \Bigg(\frac{1}{\sqrt{a}} \Bigg) & = \frac{1}{8} \Bigg[15 - 30a \Bigg(\frac{1}{\sqrt{a}} \Bigg)^2 + 15a^2 \Bigg(\frac{1}{\sqrt{a}} \Bigg)^4 \Bigg] \\
+		& = \frac{1}{8}(15 - 30 + 15) \\
+		& = 0
+	\end{align*}
+	and 
+	\begin{align*}
+	y^{\prime\prime} \Bigg(\frac{1}{\sqrt{a}} \Bigg) & = \frac{1}{8}\Bigg[-60a \Bigg(\frac{1}{\sqrt{a}} \Bigg)+ 60a^2 \Bigg(\frac{1}{\sqrt{a}} \Bigg)^3\Bigg] \\
+	& = y^{\prime\prime} = \frac{1}{8}(-60\sqrt{a} + 60\sqrt{a}) \\
+	& = 0
+	\end{align*}
+	Since the first and second derivatives are 0 at our fixed point, we can expect cubic convergence.
+	
+	
 	
 \problem{4}
-	Suppose $f(x)$ has a root of multiplicity $p>1$ at $x^*$. Then by definition there exists a function $g(x)$ such that $f(x) = (x-x^*)^pg(x)$ and $g(x^*) \neq 0$. Then $f^\prime(x) = (x-x^*)^pg^\prime(x) + p(x-x^*)^{p-1}g(x)$, and let 
-	$$
-	\mu(x) = \frac{f(x)}{f^\prime(x)} = \frac{(x-x^*)^pg(x)}{(x-x^*)^pg^\prime(x) + p(x-x^*)^{p-1}g(x)} = \frac{(x-x^*)g(x)}{(x-x^*)g^\prime(x) + pg(x)}
-	$$
-	Then $\mu(x)$ is only equal to zero when the numerator $(x-x^*)g(x)$ is equal to zero. Since $g(x)$ does not have a root at $x^*$, by definition we have $\mu(x)$ has a root of multiplicity 1 at $x^*$. Thus Newton's method on $\mu(x)$ will converge to $x^*$ quadratically. 
-
+	Suppose $f(x)$ has a root of multiplicity $p>1$ at $x^*$. Then by definition there exists a function $g(x)$ such that $f(x) = (x-x^*)^pg(x)$ and $g(x^*) \neq 0$. Then $f^\prime(x) = (x-x^*)^pg^\prime(x) + p(x-x^*)^{p-1}g(x)$. Now let 
+	\begin{align*}
+		\mu(x) & = \frac{f(x)}{f^\prime(x)} \\
+		& = \frac{(x-x^*)^pg(x)}{(x-x^*)^pg^\prime(x) + p(x-x^*)^{p-1}g(x)} \\
+		& = \frac{(x-x^*)g(x)}{(x-x^*)g^\prime(x) + pg(x)}
+	\end{align*}
+	
+	Then $\mu(x)$ is only equal to zero when the numerator $(x-x^*)g(x)$ is equal to zero. Since $g(x)$ does not have a root at $x^*$, by definition $\mu(x)$ has a root of multiplicity 1 at $x^*$. Thus Newton's method on $\mu(x)$ will converge to $x^*$ quadratically. 
+	
 \problem{5 (a)}
-	From the table below it can be seen that that the iteration occilates between 0.9948 and 0.0117. Obviously niether of these are a solution to our problem since the next iteration returns the other number for each.
+	From the table below it can be seen that that the iteration occilates between 0.9948 and 0.0117. Obviously neither of these are a solution to our problem since the next iteration returns the other number for each. 
 	\singlespacing
 	\begin{center}
 		\begin{tabular}{|c|c|}
@@ -283,6 +301,8 @@ def my_sqrt(a, x0, epsilon=1e-15, n_max=10**5):
 		\end{tabular}
 	\end{center}
 	\doublespacing
+	
+	\clearpage
 	
 \problem{5 (b)}
 	Python implementation of Steffenson's iterative method:
@@ -336,9 +356,7 @@ def hw2_p5b():
 	$$
 	g^\prime(x) = -\frac{4}{\sqrt{\pi}} e^{-x^2}
 	$$
-	Evaluating at our fixed point $x^* = 0.661560150670809$ we obtain $g(x^*) = -1.4272696617560152$. Since the magnitude of this derivative is not less than 1, we are not guaranteed convergence by the Fixed Point theorem. \\
-	\textbf{Why do we need the properties?}
-	
+	Evaluating at our fixed point $x^* = 0.661560150670809$ we obtain $g(x^*) = -1.4272696617560152$. Since the magnitude of this derivative is not less than 1, we are not guaranteed convergence by the Fixed Point theorem. 	
 	
 \problem{6} 
 	Suppose we have a function $f(x)$, such that for any $x_0$, an iteration of Newton's method returns $-x_0$. That is 
@@ -355,14 +373,16 @@ def hw2_p5b():
 		\vert y \vert & = C_1 \vert x \vert^\frac{1}{2} \\
 		y & = \pm C_1 \sqrt{\vert x \vert} \\
 	\end{align*}
-	Noticing that the derivative is undefined at $x=0$ we allow for separate solutions when $x$ is either positive or negative. When checking it is quickly shown that $f(x)=C_1 \text{sign}(x)\sqrt{\vert x \vert}$.
+	Noticing that the derivative is undefined at $x=0$ we allow for separate solutions when $x$ is either positive or negative. One can quickly check that the choice $f(x)=C_1 \text{sign}(x)\sqrt{\vert x \vert}$ is the desired general solution.
 
 \problem{7 (a)}
-	Consider the fixed point iteration $x_{n+1}=e^{x_n}-1$. This is attempting to find a fixed point for the function $y=e^x-1$. From our Fixed Point Theorem we are only guaranteed convergence when the magnitude of the derivative is less than 1 on the entire interval. Since $y^\prime=e^x$ we know that $y^\prime<1$ on the interval $(-\infty,0)$. Also $y((-\infty,0]) = (-1,0] \subseteq (-\infty,0]$. Thus all of our iterations will be in $(-\infty,0]$. Using the Fixed Point Theorem is difficult however since there is no maximum of $\vert y^\prime \vert $ on the open interval $(-\infty,1)$ and the supremum is equal to 1. We will take another approach. \bigbreak
+	Consider the fixed point iteration $x_{n+1}=e^{x_n}-1$. This is attempting to find a fixed point for the function $y=e^x-1$. From our Fixed Point Theorem we are only guaranteed convergence when the magnitude of the derivative is less than 1 on the entire interval. Since $y^\prime=e^x$ we know that $y^\prime<1$ on the interval $(-\infty,0)$. Also $y((-\infty,0]) = (-1,0] \subseteq (-\infty,0]$. Thus all of our iterations will be in $(-\infty,0]$. Using the Fixed Point Theorem is difficult however since there is no maximum of $\vert y^\prime \vert $ on the open interval $(-\infty,1)$ and the supremum is equal to 1. \bigbreak
 	
-	For $x_n\leq-1$, we know that $x_n\leq-1< e^{x_n}-1 = x_{n+1}$. We would like to show that $x_n<e^{x_n}-1$ when $-1 < x_n < 0$ as well. Consider the Taylor Series expansion of $e^{x_n}-1 = x + \mathcal{O}(x_n^2)$. The even powered terms of this series will be positive and the odd will be negative. Since the magnitude of each term is greater than the term it precedes, and it starts on an even term, the sum will be positive. Thus $x_n<e^{x_n}-1=x_{n+1}$. Since this series is monotonically increasing and it is bounded above it converges. \bigbreak
+	We will take another approach. \bigbreak
 	
-	Hence, this will converge for $x_0 \in (-\infty,0)$.
+	For $x_n\leq-1$, we know that $x_n\leq-1< e^{x_n}-1 = x_{n+1}$. We would like to show that $x_n<e^{x_n}-1$ when $-1 < x_n < 0$ as well. Consider the Taylor Series expansion of $e^{x_n}-1 = x_n + \sum\limits_{i=2}^\infty \frac{x_n^i}{n!}$. The even powered terms of this series will be positive and the odd will be negative. Since the magnitude of each term is greater than the term it precedes, and it starts on an even term, the sum will be positive. Thus $x_n<e^{x_n}-1=x_{n+1}$. Since this series is monotonically increasing and it is bounded above it converges. \bigbreak
+	
+	Hence, our iterations will converge for $x_0 \in (-\infty,0)$.
 	
 \problem{7 (b)}
 	From the Taylor Expansion of $e^x$ we know that 
@@ -389,7 +409,28 @@ def hw2_p5b():
 		- \frac{1}{2}n & < -\frac{1}{\epsilon} - \frac{1}{x_0}\\
 		n & > \frac{2}{\epsilon} + \frac{2}{x_0}
 	\end{align*}
-	Close choices of $x_0$ can reduce the required itterations since $\frac{2}{x_0}$ is negative, but for most choices  $\frac{2}{\epsilon}$ dominates. To get within $10^{-10}$ of the root, we would expect something around $2 \times 10^{10}$ (20 billion) iterations.
+	Close choices of $x_0$ can reduce the required itterations since $\frac{2}{x_0}$ is negative, but for most choices  $\frac{2}{\epsilon}$ dominates. To get within $10^{-10}$ of the root, we would expect something around $2 \times 10^{10}$ (20 billion) iterations. Since it is somewhat impractical to check this calculation we will instead attempt to verify our formula for predicting the number of iterations by using larger $\epsilon$s and better $x_0$s. The results are recorded in the table below.
+	
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|}
+			\hline
+			$\epsilon$&$x_0$&$n$ predicted&$n$ actual&relative error\\ \hline
+			0.0001&-0.1&20020&19978&0.21\%\\ \hline
+			1e-05&-0.1&200020&199977&0.02\%\\ \hline
+			1e-06&-0.1&2000020&1999977&0.00\%\\ \hline
+			0.0001&-0.01&20200&19799&2.03\%\\ \hline
+			1e-05&-0.01&200200&199798&0.20\%\\ \hline
+			1e-06&-0.01&2000200&1999797&0.02\%\\ \hline
+			0.0001&-0.001&22000&18000&22.22\%\\ \hline
+			1e-05&-0.001&202000&197999&2.02\%\\ \hline
+			1e-06&-0.001&2002000&1997998&0.20\%\\ \hline
+		\end{tabular}
+	\end{center}
+	
+	It looks like the error in our prediction begins to become significant when $x_0$ gets sufficiently close to $0$. Otherwise our predictions are becoming more accurate as $\epsilon$ becomes smaller. Based on these results we can expect that our prediction of roughly 20 billion iterations will be close to but slightly higher than the actual number of iterations for reasonable choices of $x_0$.
+	
+	
+	
 	
 
 \end{document}
