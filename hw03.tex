@@ -6,7 +6,7 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{amsthm}
-\usepackage{dsfont}
+%\usepackage{dsfont}
 
 % Macros	****************************************************************************************
 \usepackage{calc}
@@ -131,7 +131,7 @@
 			\text{ (7) } j>i, k < i && \text{ (8) } j>i, k=i && \text{ (9) } j>i, k>i
 		\end{align*}
 		First note that in cases (2), (3), and (6) note that $j<k$ and we know that $(LL^\prime)_{j,k} = 0$ since the product of lower-triangular matrices is lower-triangular.
-		\textbf{Case (1):} $j,i<i$
+		\textbf{Case (1):} $j,k<i$
 		\begin{align*}
 			(LL^\prime)_{j,k=j} & = \sum\limits_{m=1}^n L_{j,m}L^\prime_{m,k} \\
 			& = \sum\limits_{m=1}^{j-1} L_{j,m}L^\prime_{m,j} + L_{j,j}L^\prime_{j,j} + \sum\limits_{m=j+1}^n L_{j,m}L^\prime_{m,j} \\

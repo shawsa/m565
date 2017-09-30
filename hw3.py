@@ -55,3 +55,26 @@ def foo_3_helper(n):
     x = np.random.rand(n,1)
     return x,A,B,C,T
 
+def p5b():
+	A = np.zeros((5,5))
+	A[0] = [1/2, 1/3, 1/4, 1/5, 1/6]
+	A[1] = [1/3, 1/4, 1/5, 1/6, 1/7]
+	A[2] = [1/4, 1/5, 1/6, 1/7, 1/8]
+	A[3] = [1/5, 1/6, 1/7, 1/8, 1/9]
+	A[4] = [1/6, 1/7, 1/8, 1/9, 1/10]
+	
+	b = np.array([.882, .744, .618, .521, .447]).transpose()
+	
+	x = solve(A, b)
+	
+	print(x)
+	
+	K_A = np.linalg.cond(A)
+	print(K_A)
+
+	xh = np.array([-2.1333, 0.6258, 17.4552, -11.8692, -1.4994]).transpose()
+
+	print('norm of left', np.linalg.norm(x-xh)/np.linalg.norm(x))
+	print('norm of right', K_A * np.linalg.norm(b - A.dot(xh))/np.linalg.norm(b) )
+	
+	return x, np.linalg.cond(A)
