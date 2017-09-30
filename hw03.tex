@@ -1,0 +1,235 @@
+\documentclass[12pt]{article}
+
+
+% Math		****************************************************************************************
+\usepackage{fancyhdr} 
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{dsfont}
+
+% Macros	****************************************************************************************
+\usepackage{calc}
+
+% Commands and Custom Variables	********************************************************************
+\newcommand{\problem}[1]{\hspace{-4 ex} \large \textbf{#1}}
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
+
+%page		****************************************************************************************
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+%\doublespacing
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Shaw \space \thepage}
+\setlength\parindent{0pt}
+
+%Code		****************************************************************************************
+\usepackage{listings}
+\usepackage{courier}
+\lstset{
+	language=Python,
+	showstringspaces=false,
+	formfeed=newpage,
+	tabsize=4,
+	commentstyle=\itshape,
+	basicstyle=\ttfamily,
+}
+
+%Images		****************************************************************************************
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
+%Hyperlinks	****************************************************************************************
+%\usepackage{hyperref}
+%\hypersetup{
+%	colorlinks=true,
+%	linkcolor=blue,
+%	filecolor=magenta,      
+%	urlcolor=cyan,
+%}
+
+
+\begin{document}
+	\thispagestyle{empty}
+	
+	\begin{flushright}
+		Sage Shaw \\
+		m565 - Fall 2017 \\
+		\today
+	\end{flushright}
+	
+{\large \textbf{HW 3}}\bigbreak
+
+\singlespacing
+\problem{1.} Show that 
+	$$
+	%L^{-1} = 
+	\begin{bmatrix}
+		1\\
+		0 & 1\\
+		0 & 0 & \ddots\\
+		0 & 0 & 0 & 1 \\
+		0 & 0 & 0 & l_{i+1,i} & 1 \\
+		0 & 0 & 0 & l_{i+2,i} & 0 & \ddots \\
+		\vdots & \vdots & \vdots& \vdots& \vdots & \ddots & \ddots\\
+		\vdots & \vdots & \vdots& \vdots& \vdots& \vdots & \ddots & \ddots\\
+		0 & 0 & 0  & l_{n,i}  & 0 & \vdots & \vdots & \ddots & 1
+	\end{bmatrix}^{-1}
+	=
+	\begin{bmatrix}
+	1\\
+	0 & 1\\
+	0 & 0 & \ddots\\
+	0 & 0 & 0 & 1 \\
+	0 & 0 & 0 & -l_{i+1,i} & 1 \\
+	0 & 0 & 0 & -l_{i+2,i} & 0 & \ddots \\
+	\vdots & \vdots & \vdots& \vdots& \vdots & \ddots & \ddots\\
+	\vdots & \vdots & \vdots& \vdots& \vdots& \vdots & \ddots & \ddots\\
+	0 & 0 & 0  & -l_{n,i}  & 0 & \vdots & \vdots & \ddots & 1
+	\end{bmatrix}
+	%= L^\prime
+	$$
+	for $i = 1, 2, ..., n-1$.
+
+	\begin{proof}Let the matrix on the left be $L^{-1}$ and the matrix on the right be $L^\prime$. \\
+		Note that for a given $i$ the elements of the lower triangular matrix $L$ follow this form
+		$$
+		L_{j,k} =
+		\begin{cases}
+			1 & \text{if } j=k \\
+			0 & \text{if } j \neq k \neq i \\
+			l_{j,k} & \text{if } j > i \text{ and } k = i
+		\end{cases}
+		$$
+		and the elements of the lower triangular matrix $L^\prime$ follow this form
+		$$
+		L_{j,k} =
+		\begin{cases}
+		1 & \text{if } j=k \\
+		0 & \text{if } j \neq k \neq i \\
+		-l_{j,k} & \text{if } j > i \text{ and } k = i
+		\end{cases}
+		$$
+		Their product (also a lower triangular matrix) would then be given by
+		$$
+		(LL^\prime)_{j,k} = \sum\limits_{m=1}^n L_{j,m}L^\prime_{m,k}
+		$$
+		It remains to show that
+		$$
+		(LL^\prime)_{j,k} =
+		\begin{cases}
+			1 & \text{if } j=k \\
+			0 & \text{else}
+		\end{cases}
+		$$
+		We can now divide this problem into the following nine cases
+		\begin{align*}
+			\text{ (1) } j<i, k < i && \text{ (2) } j<i, k=i && \text{ (3) } j<i, k>i \\
+			\text{ (4) } j=i, k < i && \text{ (5) } j=i, k=i && \text{ (6) } j=i, k>i \\
+			\text{ (7) } j>i, k < i && \text{ (8) } j>i, k=i && \text{ (9) } j>i, k>i
+		\end{align*}
+		First note that in cases (2), (3), and (6) note that $j<k$ and we know that $(LL^\prime)_{j,k} = 0$ since the product of lower-triangular matrices is lower-triangular.
+		\textbf{Case (1):} $j,i<i$
+		\begin{align*}
+			(LL^\prime)_{j,k=j} & = \sum\limits_{m=1}^n L_{j,m}L^\prime_{m,k} \\
+			& = \sum\limits_{m=1}^{j-1} L_{j,m}L^\prime_{m,j} + L_{j,j}L^\prime_{j,j} + \sum\limits_{m=j+1}^n L_{j,m}L^\prime_{m,j} \\
+			& = \sum\limits_{m=1}^{j-1} (0)(0) + (1)(1) + \sum\limits_{m=j+1}^n (0)(0) \\
+			& = 1
+		\end{align*}
+		and if $j<k$ then $(LL^\prime)_{j,k} = 0$ as above. Lastly if $k < j$ then
+		\begin{align*}
+			(LL^\prime)_{j,k} & = \sum\limits_{m=1}^n L_{j,m}L^\prime_{m,k} \\
+			& = \sum\limits_{m=1}^{k-1} L_{j,m}L^\prime_{m,j} + L_{j,k}L^\prime_{k,k} + \sum\limits_{m=k+1}^{j-1} L_{j,m}L^\prime_{m,j} + L_{j,j}L^\prime_{j,k} + \sum\limits_{m=j+1}^{n} L_{j,m}L^\prime_{m,j} \\
+			& = \sum\limits_{m=1}^{k-1} (0)(0) + (0)(1) + \sum\limits_{m=k+1}^{j-1} (0)(0) + (1)(0) + \sum\limits_{m=j+1}^{n} (0)(0) \\
+			& = 0
+		\end{align*}
+		\textbf{Case (4):} $k<j=i$
+		\begin{align*}
+			(LL^\prime)_{j,k} & = \sum\limits_{m=1}^n L_{j,m}L^\prime_{m,k} \\
+			& = \sum\limits_{m=1}^{k-1} L_{j,m}L^\prime_{m,j} + L_{j,k}L^\prime_{k,k} + \sum\limits_{m=k+1}^{j-1} L_{j,m}L^\prime_{m,j} + L_{j,j}L^\prime_{j,k} + \sum\limits_{m=j+1}^{n} L_{j,m}L^\prime_{m,j} \\
+			& = \sum\limits_{m=1}^{k-1} (0)(0) + (0)(1) + \sum\limits_{m=k+1}^{j-1} (0)(0) + (1)(0) + \sum\limits_{m=j+1}^{n} (0)(0) \\
+			& = 0
+		\end{align*}
+		\textbf{Case (5):} $j=i=k$
+		\begin{align*}
+			(LL^\prime)_{i,i} & = \sum\limits_{m=1}^n L_{i,m}L^\prime_{m,i} \\
+			& = \sum\limits_{m=1}^{i-1} L_{i,m}L^\prime_{m,i} + L_{i,i}L^\prime_{i,i} + \sum\limits_{m=i+1}^{n} L_{i,m}L^\prime_{m,i} \\
+			& = \sum\limits_{m=1}^{i-1} (0)(0) + (1)(1) + \sum\limits_{m=i+1}^{n} (0)(-l_{m,i}) \\
+			& = 0
+		\end{align*}
+		\textbf{Case (7):} $k < i < j$
+		\begin{align*}
+			(LL^\prime)_{j,k} & = \sum\limits_{m=1}^n L_{j,m}L^\prime_{m,k} \\
+			& = \sum\limits_{m=1}^{k-1} L_{j,m}L^\prime_{m,k} + L_{j,k}L^\prime_{k,k} + \sum\limits_{m=k+1}^{i-1} L_{j,m}L^\prime_{m,k} + L_{j,i}L^\prime_{i,k} \\
+				&\text{\space \space \space} + \sum\limits_{m=i+1}^{j-1} L_{j,m}L^\prime_{m,k} + L_{j,j}L^\prime_{j,k} + \sum\limits_{m=j+1}^{n} L_{j,m}L^\prime_{m,k} \\
+			& = \sum\limits_{m=1}^{k-1} (0)(0) + (0)(1) + \sum\limits_{m=k+1}^{i-1} (0)(0) + (l_{j,i})(0) \\
+				&\text{\space \space \space} + \sum\limits_{m=i+1}^{j-1} (0)(0) + (1)(0) + \sum\limits_{m=j+1}^{n} (0)(0) \\
+			& = 0
+		\end{align*}
+		\textbf{Case (8):} $i=k<j$
+		\begin{align*}
+			(LL^\prime)_{j,i} & = \sum\limits_{m=1}^n L_{j,m}L^\prime_{m,i} \\
+			& = \sum\limits_{m=1}^{i-1} L_{j,m}L^\prime_{m,i} + L_{j,i}L^\prime_{i,i} + \sum\limits_{m=i+1}^{j-1} L_{j,m}L^\prime_{m,i} + L_{j,j}L^\prime_{j,i} + \sum\limits_{m=j+1}^{n} L_{j,m}L^\prime_{m,i} \\
+			& = \sum\limits_{m=1}^{i-1} (0)(0) + (l_{j,i})(1) + \sum\limits_{m=i+1}^{j-1} (0)(-l_{m,i}) + (1)(-l_{j,i}) + \sum\limits_{m=j+1}^{n} (0)(-l_{m,i}) \\
+			& = l_{j,i} - l_{j,i} \\
+			& = 0
+		\end{align*}
+		\textbf{Case (9):} $i< j,k$ \\
+		If $j<k$ then $(LL^\prime)_{j,k} = 0$ as above, and if $k=j$ then
+		\begin{align*}
+			(LL^\prime)_{j,k=j} & = \sum\limits_{m=1}^n L_{j,m}L^\prime_{m,k} \\
+			& = \sum\limits_{m=1}^{i-1} L_{j,m}L^\prime_{m,j} + L_{j,i}L^\prime_{i,j} + \sum\limits_{m=i+1}^{j-1} L_{j,m}L^\prime_{m,j} + L_{j,j}L^\prime_{j,j} + \sum\limits_{m=j+1}^{n} L_{j,m}L^\prime_{m,j} \\
+			& = \sum\limits_{m=1}^{i-1} (0)(0) + (l_{j,i})(0) + \sum\limits_{m=i+1}^{j-1} (0)(0) + (1)(1) + \sum\limits_{m=j+1}^{n} (0)(0)\\
+			& = 1
+		\end{align*}
+		And finally if $k < j$ then
+		\begin{align*}
+			(LL^\prime)_{j,k} & = \sum\limits_{m=1}^n L_{j,m}L^\prime_{m,k} \\
+			& = \sum\limits_{m=1}^{i-1} L_{j,m}L^\prime_{m,k} + L_{j,i}L^\prime_{i,k} + \sum\limits_{m=i+1}^{k-1} L_{j,m}L^\prime_{m,k} + L_{j,k}L^\prime_{k,k} \\
+				&\text{\space \space \space} + \sum\limits_{m=k+1}^{j-1} L_{j,m}L^\prime_{m,k} + L_{j,j}L^\prime_{j,k} + \sum\limits_{m=j+1}^{n} L_{j,m}L^\prime_{m,k} \\
+			& = \sum\limits_{m=1}^{i-1} (0)(0) + (l_{j,i})(0) + \sum\limits_{m=i+1}^{k-1} (0)(0) + (0)(1) \\
+				&\text{\space \space \space} + \sum\limits_{m=k+1}^{j-1} (0)(0) + (1)(0) + \sum\limits_{m=j+1}^{n} (0)(0) \\
+			& = 0
+		\end{align*}
+		We have now proven that $LL^\prime = I$ and thus $L^{-1}=L^\prime$.		
+	\end{proof}
+	
+\problem{2.} Let $T$ be a (diagonally dominant) tridiagonal matrix, $A$ be a symmetric positive definite matrix, and $B$ and $C$ be full nonsingular matrices. Assume all of these matrices are of size $n$-by-$n$. Let $f(x)$ be defined as follows $$f(x) = x^TB^{-1}CT^{-1}A^{-1}x + b^TB^{-T}x$$ where $x$ and $b$ are column vectors of size $n$.
+
+\problem{2.} Describe how to efficiently evaluate the function $f(x)$. \\
+	
+	
+\problem{3. (a)}
+
+	Since calculating the inverse of matrices is inefficient, we would like to avoid it and instead use variations on Gaussian elimination. First note that $B^{-1}$ appears twice, so factoring it once will reduce computation time. Since $A$ is SPD, it's faster to calculate the Cholesky decomposition and perform forward and backward substitution, than it is to perform Gaussian elimination. Since $T$ is banded, we will be sure to use a factorization to take advantage of this property. \bigbreak
+	
+	Calculate the LU factorization of $B = LU$. \\
+	Note that $B^{-T}x = (LU)^{-T}x = (U^TL^T)^{-1}x = L^{-T}U^{-T}x$. \\
+	Let $y = (U^T)^{-1}x$. \\
+	Solve for $y$ using forward substitution on the system $U^Ty=x$ since $U^T$ is lower-triangular. \\
+	Now let $w = (L^T)^{-1}y$. Solve for $w$ using backward substitution on the system $L^Tw=y$ since $L^T$ is upper-triangular. \\
+	Calculate the scalar $K_2 = x^Tw$. Note that
+	\begin{align*}
+		K_2 = x^Tw = x^T(L^T)^{-1}y = x^T(L^T)^{-1}(U^T)^{-1}x = x^TB^{-T}x
+	\end{align*}
+	Calculate the Cholesky decomposition $A = HH^T$ where $H$ is a lower-triangular matrix. \\
+	Calculate the LU factorization $T = EF$ taking advantage of the shape of $T$ to do this efficiently. \\
+	Then $B^{-1} = U^{-1}L^{-1}$, $A^{-1}=(H^T)^{-1}H^{-1}$, and $T^{-1} = F^{-1}E^{-1}$. Substituting we get
+	$$
+	x^TB^{-1}CT^{-1}A^{-1}x = x^TU^{-1}L^{-1}CF^{-1}E^{-1}(H^T)^{-1}H^{-1}x
+	$$
+	Solve $Hy_1=x$ using forward substitution.\\
+	Solve $H^Ty_2 = y_1$ using back substitution.\\
+	Solve $E y_3 = y_2$ using back substitution. \\
+	Solve $F y_4 = y_3$ using forward substitution. \\
+	Calculate $y_5 = Cy_4$ by matrix-vector multiplication. \\
+	Solve $L y_6 = y_5$ using forward substitution. \\
+	Solve $U y_7 = y_6$ using back substitution. \\
+	Calculate $K_1 = x^Ty_7$. \\
+	It is easily shown in the manner above that $K_1 = x^TB^{-1}CT^{-1}A^{-1}x$.\\
+	At last $f(x) = K_1 + K_2$.\\
+
+
+\end{document}
