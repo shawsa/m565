@@ -2,25 +2,47 @@ import numpy as np
 from scipy.linalg import *
 
 def foo_3b_bad(x,A,B,C,T):
-    K_2 = inv(B.transpose()).dot(x)
-    K_2 = x.transpose().dot(K_2)
+    k2 = inv(B.transpose()).dot(x)
+    k2 = x.transpose().dot(k2)
     
-    K_1 = inv(A).dot(x)
-    K_1 = inv(T).dot(K_1)
-    K_1 = C.dot(K_1)
-    K_1 = inv(B).dot(K_1)
-    K_1 = x.transpose().dot(K_1)
+    k1 = inv(A).dot(x)
+    k1 = inv(T).dot(k1)
+    k1 = C.dot(k1)
+    k1 = inv(B).dot(k1)
+    k1 = x.transpose().dot(k1)
     
-    return K_1 + K_2
+    return k1 + k2
 
 def foo_3b(x,A,B,C,T):
+    n = A.shape[0]
     
     P, L, U = lu(B)
-    y = 
     
+    k2 = solve_triangular(U.transpose(), x, lower=True)
+    k2 = solve_triangular(L.transpose(), k2, lower=False)
+    k2 = P.dot(k2)
+    k2 = x.transpose().dot(k2)
     
+    H = cholesky(A, lower=True)
     
-    return P
+    k1 = solve_triangular(H,x, lower=True)
+    k1 = solve_triangular(H.transpose(),k1, lower=False)
+    
+    #convert T to a banded matrix datatype
+    bandedT = np.zeros( (3,T.shape[0]) )
+    bandedT[0][1:n] = T.diagonal(1)
+    bandedT[1][0:n] = T.diagonal(0)
+    bandedT[2][0:n-1] = T.diagonal(-1)
+    
+    k1 = solve_banded( (1,1), bandedT, k1 )
+    
+    k1 = C.dot(k1)
+    k1 = solve_triangular(U, k1, lower=False)
+    k1 = P.dot(k1)
+    k1 = solve_triangular(L, k1, lower=True)
+    k1 = x.transpose().dot(k1)
+    
+    return k1 + k2
     
 def foo_3_helper(n):
     A = np.random.rand(n,n)
