@@ -196,12 +196,100 @@
 		\end{align*}
 		We have now proven that $LL^\prime = I$ and thus $L^{-1}=L^\prime$.		
 	\end{proof}
-	
-\problem{2.} Let $T$ be a (diagonally dominant) tridiagonal matrix, $A$ be a symmetric positive definite matrix, and $B$ and $C$ be full nonsingular matrices. Assume all of these matrices are of size $n$-by-$n$. Let $f(x)$ be defined as follows $$f(x) = x^TB^{-1}CT^{-1}A^{-1}x + b^TB^{-T}x$$ where $x$ and $b$ are column vectors of size $n$.
 
-\problem{2.} 
+\problem{2.} Illustrate how to efficiently solve a linear system of the shape below in the 9-by-9 case and determine the operation count for the general $n$-by-$n$ case.
+	$$
+	\begin{bmatrix}
+		\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}\\
+		\text{\textbullet}&\text{\textbullet}&&&&&&\text{\textbullet}&\text{\textbullet}\\
+		\text{\textbullet}&&\text{\textbullet}&&&&\text{\textbullet}&&\text{\textbullet}\\
+		\text{\textbullet}&&&\text{\textbullet}&&\text{\textbullet}&&&\text{\textbullet}\\
+		\text{\textbullet}&&&&\text{\textbullet}&&&&\text{\textbullet}\\
+		\text{\textbullet}&&&\text{\textbullet}&&\text{\textbullet}&&&\text{\textbullet}\\
+		\text{\textbullet}&&\text{\textbullet}&&&&\text{\textbullet}&&\text{\textbullet}\\
+		\text{\textbullet}&\text{\textbullet}&&&&&&\text{\textbullet}&\text{\textbullet}\\
+		\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}\\
+	\end{bmatrix}\begin{bmatrix}\\ \\ \\ \\ x \\ \\ \\ \\ \\\end{bmatrix}= \begin{bmatrix}\\ \\ \\ \\ b \\ \\ \\ \\ \\\end{bmatrix}
+	$$
+
+	Systems of this shape can be solved efficiently by a variation on Gaussian elimination. We must be careful when we generalize from the 9-by-9 case to even cases, as they will not have a middle row. This difference in shape will lead to different operation counts for odd values of $n$ and even values of $n$. Let $A$ denote our $n$-by-$n$ matrix above. \bigbreak
 	
+	\emph{Step 1}: For  $j=2$ through $\tfrac{n-1}{2}$ ($\tfrac{n}{2}$ for the even case) use row $j$ to eliminate the $A_{n-j, j}$ element. In counting operations, note that there are four elements in each of these rows. The multiplier must be calculated by a division. One of the elements in the row gets assigned the value $0$. The other three will involve a multiplication and a subtraction, as well as the $b$ vector. This gives $1+6+2=9$ operations. The eliminated values are marked by an $\times$ below.
+	$$
+	\begin{bmatrix}
+	\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}\\
+	\text{\textbullet}&\text{\textbullet}&&&&&&\text{\textbullet}&\text{\textbullet}\\
+	\text{\textbullet}&&\text{\textbullet}&&&&\text{\textbullet}&&\text{\textbullet}\\
+	\text{\textbullet}&&&\text{\textbullet}&&\text{\textbullet}&&&\text{\textbullet}\\
+	\text{\textbullet}&&&&\text{\textbullet}&&&&\text{\textbullet}\\
+	\text{\textbullet}&&&\times&&\text{\textbullet}&&&\text{\textbullet}\\
+	\text{\textbullet}&&\times&&&&\text{\textbullet}&&\text{\textbullet}\\
+	\text{\textbullet}&\times&&&&&&\text{\textbullet}&\text{\textbullet}\\
+	\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}\\
+	\end{bmatrix}\begin{bmatrix}\\ \\ \\ \\ x \\ \\ \\ \\ \\\end{bmatrix}= \begin{bmatrix}\\ \\ \\ \\ b \\ \\ \\ \\ \\\end{bmatrix}
+	$$
+	\emph{Step 2}: For $j=2$ through $\tfrac{n-1}{2}$ ($\tfrac{n}{2}$ even) use row $n-j$ to eliminate element $A_{j,n-j}$. There are three values to update, one of which is zero. So similarly to before we have $1+4+2=7$ operations.
+	$$
+	\begin{bmatrix}
+	\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}\\
+	\text{\textbullet}&\text{\textbullet}&&&&&&\times&\text{\textbullet}\\
+	\text{\textbullet}&&\text{\textbullet}&&&&\times&&\text{\textbullet}\\
+	\text{\textbullet}&&&\text{\textbullet}&&\times&&&\text{\textbullet}\\
+	\text{\textbullet}&&&&\text{\textbullet}&&&&\text{\textbullet}\\
+	\text{\textbullet}&&&&&\text{\textbullet}&&&\text{\textbullet}\\
+	\text{\textbullet}&&&&&&\text{\textbullet}&&\text{\textbullet}\\
+	\text{\textbullet}&&&&&&&\text{\textbullet}&\text{\textbullet}\\
+	\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}&\text{\textbullet}\\
+	\end{bmatrix}\begin{bmatrix}\\ \\ \\ \\ x \\ \\ \\ \\ \\\end{bmatrix}= \begin{bmatrix}\\ \\ \\ \\ b \\ \\ \\ \\ \\\end{bmatrix}
+	$$
+	\emph{Step 3}: For $j=2$ through $n-1$ use row $j$ to eliminate the $A_{1,j}$ and $A_{n,j}$ elements. Each row has three elements so as in the previous step we have $7$ operations per row. 
+	$$
+	\begin{bmatrix}
+	\text{\textbullet}&\times&\times&\times&\times&\times&\times&\times&\text{\textbullet}\\
+	\text{\textbullet}&\text{\textbullet}&&&&&&&\text{\textbullet}\\
+	\text{\textbullet}&&\text{\textbullet}&&&&&&\text{\textbullet}\\
+	\text{\textbullet}&&&\text{\textbullet}&&&&&\text{\textbullet}\\
+	\text{\textbullet}&&&&\text{\textbullet}&&&&\text{\textbullet}\\
+	\text{\textbullet}&&&&&\text{\textbullet}&&&\text{\textbullet}\\
+	\text{\textbullet}&&&&&&\text{\textbullet}&&\text{\textbullet}\\
+	\text{\textbullet}&&&&&&&\text{\textbullet}&\text{\textbullet}\\
+	\text{\textbullet}&\times&\times&\times&\times&\times&\times&\times&\text{\textbullet}\\
+	\end{bmatrix}\begin{bmatrix}\\ \\ \\ \\ x \\ \\ \\ \\ \\\end{bmatrix}= \begin{bmatrix}\\ \\ \\ \\ b \\ \\ \\ \\ \\\end{bmatrix}
+	$$
+	\emph{Step 4}: For $j=2$ through $n$ we use the first row to eliminate the $A_{j,1}$ element. This takes $5$ operations per row.
+	$$
+	\begin{bmatrix}
+	\text{\textbullet}&&&&&&&&\text{\textbullet}\\
+	\times&\text{\textbullet}&&&&&&&\text{\textbullet}\\
+	\times&&\text{\textbullet}&&&&&&\text{\textbullet}\\
+	\times&&&\text{\textbullet}&&&&&\text{\textbullet}\\
+	\times&&&&\text{\textbullet}&&&&\text{\textbullet}\\
+	\times&&&&&\text{\textbullet}&&&\text{\textbullet}\\
+	\times&&&&&&\text{\textbullet}&&\text{\textbullet}\\
+	\times&&&&&&&\text{\textbullet}&\text{\textbullet}\\
+	\times&&&&&&&&\text{\textbullet}\\
+	\end{bmatrix}\begin{bmatrix}\\ \\ \\ \\ x \\ \\ \\ \\ \\\end{bmatrix}= \begin{bmatrix}\\ \\ \\ \\ b \\ \\ \\ \\ \\\end{bmatrix}
+	$$
+	\emph{Step 5}: We can now use backward substitution to find the values of $x$. First note that $x_n=\tfrac{b_n}{A_{n,n}}$ taking one operation.
+	\emph{Step 6}: Next for $j=1$ through $n-1$ we can compute $x_j=\tfrac{b_j-A_{j,n}x_n}{A_{j,j}}$, taking 3 operations per entry. This solves the system of equations. \bigbreak
 	
+	The final operation count for the general $n$-by-$n$ case is totaled in the table below.
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|}\hline
+			&\multicolumn{2}{|c|}{$n$-odd}&\multicolumn{2}{|c|}{$n$-even} \\ \hline
+			\emph{Step}&FLOP count&times&FLOP count&times \\ \hline
+			1 &9 & $\tfrac{n-1}{2}-1$ &9 & $\tfrac{n}{2}-1$ \\ \hline
+			2 &7 & $\tfrac{n-1}{2}-1$ &7 & $\tfrac{n}{2}-1$ \\ \hline
+			3 &7 & $2(n-2)$ &7 & $2(n-2)$ \\ \hline
+			4 &5 & $n-1$ &5 & $n-1$ \\ \hline
+			5 &1 & 1 &1 & 1 \\ \hline
+			6 &3 & $n-1$ &3 & $n-1$ \\ \hline
+		\end{tabular}
+	\end{center}
+	Finally we have our flop counts. There are $30n-59$ operations for the case when $n$ is odd, and $30n-51$ when $n$ is even.	\bigbreak
+	
+\problem{3.} Let $T$ be a (diagonally dominant) tridiagonal matrix, $A$ be a symmetric positive definite matrix, and $B$ and $C$ be full nonsingular matrices. Assume all of these matrices are of size $n$-by-$n$. Let $f(x)$ be defined as follows $$f(x) = x^TB^{-1}CT^{-1}A^{-1}x + b^TB^{-T}x$$ where $x$ and $b$ are column vectors of size $n$.
+
 \problem{3. (a)} Describe how to efficiently evaluate the function $f(x)$. \\
 
 	Since calculating the inverse of matrices is inefficient, we would like to avoid it and instead use variations on Gaussian elimination. First note that $B^{-1}$ appears twice, so factoring it once will reduce computation time. Since $A$ is SPD, it's faster to calculate the Cholesky decomposition and perform forward and backward substitution, than it is to perform Gaussian elimination. Since $T$ is banded, we will be sure to use a factorization to take advantage of this property. \bigbreak
@@ -342,14 +430,14 @@ def p3c ():
 	\begin{align*}
 		k_j &= b_j - d_ju_{j-2} \\
 		l_j &= a_j - d_jw_{j-2} - k_ju_{j-1} \\
-		u_j &= (c_j - b_jw_{j-1})/l_j \\
+		u_j &= (c_j - k_jw_{j-1})/l_j \\
 		w_j & = e_j/l_j
 	\end{align*}
 	\emph{Step $n-1$:} 
 	\begin{align*}
 		k_{n-1} &= b_{n-1} - d_{n-1}u_{n-3} \\
 		l_{n-1} &= a_{n-1} - d_{n-1}w_{n-3} - k_{n-1}u_{n-2} \\
-		u_{n-1} &= (c_{n-1} - b_{n-1}w_{n-2})/l_{n-1} \\
+		u_{n-1} &= (c_{n-1} - k_{n-1}w_{n-2})/l_{n-1} \\
 	\end{align*}
 	\emph{Step $n$:} 
 	\begin{align*}
@@ -386,7 +474,7 @@ def p3c ():
 			\multicolumn{3}{|c|}{Forward Substitution} \\ \hline
 			\emph{Step}&FLOP count&times \\ \hline
 			1 &1 & 1 \\ \hline
-			2 &2 & 1 \\ \hline
+			2 &3 & 1 \\ \hline
 			$j$ & 5 & $n-2$ \\ \hline
 		\end{tabular}
 	\end{center}
@@ -399,7 +487,7 @@ def p3c ():
 			$j$ & 4 & $n-2$ \\ \hline
 		\end{tabular}
 	\end{center}
-	This gives us $19n-30$ operations for the factorization (note that this is only an accurate count for $n \geq 3$ since this that is the minimum for a penta-diagonal system).
+	This gives us $19n-29$ operations for the factorization (note that this is only an accurate count for $n \geq 3$ since this that is the minimum for a penta-diagonal system).
 	
 \problem{4. (c)} Implement your algorithm. \\
 
@@ -505,5 +593,104 @@ GE 0.000000
 	$$
 	\frac{\norm{x - \hat{x}}}{\norm{x}} \leq \kappa(A)\frac{\norm{A\hat{x}-b}}{\norm{b}}
 	$$
+	If the condition number is large enough, the residual can be significantly larger than the error.
+	
+\problem{5. (b)} Use MATLAB to obtain an accurate solution to the given system.
+
+	The following Python code generates an accurate solution and computes the condition number.
+	\begin{lstlisting}
+def p5b():
+	A = np.zeros((5,5))
+	A[0] = [1/2, 1/3, 1/4, 1/5, 1/6]
+	A[1] = [1/3, 1/4, 1/5, 1/6, 1/7]
+	A[2] = [1/4, 1/5, 1/6, 1/7, 1/8]
+	A[3] = [1/5, 1/6, 1/7, 1/8, 1/9]
+	A[4] = [1/6, 1/7, 1/8, 1/9, 1/10]
+	b = np.array([.882, .744, .618, .521, .447]).transpose()
+	x = solve(A, b)
+	print(x)
+	K_A = np.linalg.cond(A)
+	print('Condition number %f' % K_A)
+	xh = np.array([-2.1333, 0.6258, 17.4552, -11.8692, -1.4994]).transpose()
+	print('norm of left %f' % (np.linalg.norm(x-xh)/np.linalg.norm(x)) )
+	print('norm of right %f ' % (K_A * np.linalg.norm(b - A.dot(xh))/np.linalg.norm(b)) )
+	return x, np.linalg.cond(A)
+	\end{lstlisting}
+	An accurate solution is $x = [-2.52, 5.04, 2.52, 7.56, -10.08]^T$. \bigbreak
+	
+\problem{5. (c)} Use MATLAB again to obtain the condition number for $A$. Use the appropriate result on perturbations of the RHS of a linear system to confirm that this very small residual indeed big enough to allow for the solution to be as far away from the correct one as occurs in this example. \bigbreak
+
+	From the code in part (b) we have the condition number of $A$ is \\ 
+	$\kappa(A)=1,535,043.895329$ (this is using the 2-norm).
+	
+\problem{6 (a)} Add code to the gepp.m function to compute the growth factor.
+
+	MATLAB code:
+	\begin{lstlisting}[language=matlab]
+function [A,p,q] = lucp(A)
+n = size(A,1);
+p = (1:n)';
+q = (1:n);
+for k=1:n-1
+% Find the entry that contains the largest entry in magnitude
+[temp, col_max] = max(abs(A(k:n,k:n)));
+[temp, x_pos] = max(col_max);
+y_pos = col_max(x_pos);
+row2swap = k-1+x_pos
+col2swap = k-1+y_pos
+% Swap the rows and columns of A and p (perform complete pivoting)
+A([row2swap, k],:) = A([k, row2swap],:);
+p([row2swap, k]) = p([k, row2swap]);
+A(:,[col2swap,k]) = A(:,[k,col2swap]);
+q(:,[col2swap,k]) = q(:,[k,col2swap]);
+% Perform the kth step of Gaussian elimination
+J = k+1:n;
+A(J,k) = A(J,k)/A(k,k);
+A(J,J) = A(J,J) - A(J,k)*A(k,J);
+end
+end
+	\end{lstlisting}
+	
+\problem{6 (b)} Compute the growth factor for the matrix given.
+	
+	\begin{lstlisting}[language=matlab]
+B = eye(21,21) - tril(ones(21,21),-1)
+B(:,21)=1
+[A,p,g] = lupp_growth(B)
+	\end{lstlisting}
+	
+	The growth factor for $A$ is $g_21(A)=1,048,576 = 2^{20}$ as expectted.
+	
+\problem{6 (c)} Show that the growth for the general $n$-by-$n$ case is exactly $g_n(A)=2^{n-1}$.
+
+\problem{7 (a)} Modify the code on the course webpage to do Gaussian elimination with complete pivoting.
+
+	This is accomplished via two separate MATLAB functions: the LU decomposition with complete pivoting, and then another file to corectly use forward and backward substitution.
+	\begin{lstlisting}[language=matlab]
+function [A,p,q] = lucp(A)
+n = size(A,1);
+p = (1:n)';
+q = (1:n);
+for k=1:n-1
+% Find the entry that contains the largest entry in magnitude
+[temp, col_max] = max(abs(A(k:n,k:n)));
+[temp, x_pos] = max(col_max);
+y_pos = col_max(x_pos);
+row2swap = k-1+x_pos
+col2swap = k-1+y_pos
+% Swap the rows and columns of A and p (perform complete pivoting)
+A([row2swap, k],:) = A([k, row2swap],:);
+p([row2swap, k]) = p([k, row2swap]);
+A(:,[col2swap,k]) = A(:,[k,col2swap]);
+q(:,[col2swap,k]) = q(:,[k,col2swap]);
+% Perform the kth step of Gaussian elimination
+J = k+1:n;
+A(J,k) = A(J,k)/A(k,k);
+A(J,J) = A(J,J) - A(J,k)*A(k,J);
+end
+end
+
+
+	\end{lstlisting}
 
 \end{document}
