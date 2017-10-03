@@ -10,6 +10,7 @@
 
 % Macros	****************************************************************************************
 \usepackage{calc}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 
 % Commands and Custom Variables	********************************************************************
 \newcommand{\problem}[1]{\hspace{-4 ex} \large \textbf{#1}}
@@ -198,10 +199,10 @@
 	
 \problem{2.} Let $T$ be a (diagonally dominant) tridiagonal matrix, $A$ be a symmetric positive definite matrix, and $B$ and $C$ be full nonsingular matrices. Assume all of these matrices are of size $n$-by-$n$. Let $f(x)$ be defined as follows $$f(x) = x^TB^{-1}CT^{-1}A^{-1}x + b^TB^{-T}x$$ where $x$ and $b$ are column vectors of size $n$.
 
-\problem{2.} Describe how to efficiently evaluate the function $f(x)$. \\
+\problem{2.} 
 	
 	
-\problem{3. (a)}
+\problem{3. (a)} Describe how to efficiently evaluate the function $f(x)$. \\
 
 	Since calculating the inverse of matrices is inefficient, we would like to avoid it and instead use variations on Gaussian elimination. First note that $B^{-1}$ appears twice, so factoring it once will reduce computation time. Since $A$ is SPD, it's faster to calculate the Cholesky decomposition and perform forward and backward substitution, than it is to perform Gaussian elimination. Since $T$ is banded, we will be sure to use a factorization to take advantage of this property. \bigbreak
 	
@@ -231,5 +232,278 @@
 	It is easily shown in the manner above that $K_1 = x^TB^{-1}CT^{-1}A^{-1}x$.\\
 	At last $f(x) = K_1 + K_2$.\\
 
+\problem{3. (b)} Implement the algorithm \\
+	\begin{lstlisting}
+def foo_3b(x,v,A,B,C,T):
+	n = A.shape[0]
+	P, L, U = lu(B)
+	k2 = solve_triangular(U.transpose(), x, lower=True)
+	k2 = solve_triangular(L.transpose(), k2, lower=False)
+	k2 = P.dot(k2)
+	k2 = x.transpose().dot(k2)
+	H = cholesky(A, lower=True)
+	k1 = solve_triangular(H,x, lower=True)
+	k1 = solve_triangular(H.transpose(),k1, lower=False)
+	#convert T to a banded matrix datatype
+	bandedT = np.zeros( (3,T.shape[0]) )
+	bandedT[0][1:n] = T.diagonal(1)
+	bandedT[1][0:n] = T.diagonal(0)
+	bandedT[2][0:n-1] = T.diagonal(-1)
+	k1 = solve_banded( (1,1), bandedT, k1 )
+	k1 = C.dot(k1)
+	k1 = P.transpose().dot(k1)
+	k1 = solve_triangular(L, k1, lower=True)
+	k1 = solve_triangular(U, k1, lower=False)
+	k1 = v.transpose().dot(k1)
+	return k1 + k2
+	\end{lstlisting}
+	
+\problem{3. (c)} Test the code. \\
+	\textbf{Test how?}\\
+	With the benefit of the helper function to generate appropriate random values we can test the code above.
+	\begin{lstlisting}
+def foo_3_helper(n):
+	A = np.random.rand(n,n)
+	A = A.dot(A.transpose()) + np.identity(n)
+	B = np.random.rand(n,n)
+	C = np.random.rand(n,n)
+	T = np.diag(np.random.rand(n-1), -1) 
+	T += np.diag(np.random.rand(n), 0) 
+	T += np.diag(np.random.rand(n-1), 1)
+	x = np.random.rand(n,1)
+	v = np.random.rand(n,1)
+	return x,v,A,B,C,T
+		
+def foo_3b_bad(x,v,A,B,C,T):
+	#used for testing only
+	k2 = inv(B.transpose()).dot(x)
+	k2 = x.transpose().dot(k2)
+	k1 = inv(A).dot(x)
+	k1 = inv(T).dot(k1)
+	k1 = C.dot(k1)
+	k1 = inv(B).dot(k1)
+	k1 = v.transpose().dot(k1)
+	return k1 + k2
+	
+def p3c ():
+	for i in range(20):
+		x,v,A,B,C,T = foo_3_helper(100)
+		print(foo_3b(x,v,A,B,C,T))
+	\end{lstlisting}
+	Testing concludes that the calculated values are nearly the same (floating point rounding errors) and that our implementation is indeed faster for sufficiently large matricies.
+	
+\problem{4. (a)} Derive a fast algorithm for solving penta-diagonal systems. \\
+
+	As in the case for tri-diagonal systems we will first find a fast algorithm for factoring, and then find fast algorithms for forward and backward substitution. In the case of the factorization, it is easy to see that the LU factorization of a penta diagonal system will be a lower triangular matrix $L$, which has zeros below the second sub-diagonal, and an upper-triangular matrix U which has zeros above the second super-diagonal. Furthermore, we can assume that the primary diagonal of one of the matrices is all ones. We will choose $U$ to have ones along the diagonal. We will also assume that the second sub diagonal of $L$ has the same values as the second subdiagonal of our penta-diagonal matrix $P$. In short, our matrix can be factored in the form below: \\
+	$P=LU$ where \\
+	$$P = \begin{bmatrix}
+		a_1 & c_1 & e_1\\
+		b_2 & a_2 & c_2 & e_2\\
+		d_3 & b_3 & a_3 & c_3 & e_3\\
+		 & \ddots & \ddots & \ddots  & \ddots & \ddots\\
+		 &  & d_{n-2} & b_{n-2} & a_{n-2} & c_{n-2} & e_{n-2}\\
+		 &  & & d_{n-1} & b_{n-1} & a_{n-1} & c_{n-1} \\
+		 &  &  &  & d_{n} & b_{n} & a_{n} \\
+	\end{bmatrix}$$
+	$$L = \begin{bmatrix}
+		l_1 \\
+		k_2 & l_2 \\
+		d_3 & k_3 & l_3 \\
+		& \ddots & \ddots & \ddots \\
+		&  & d_{n-2} & k_{n-2} & l_{n-2} \\
+		&  & & d_{n-1} & k_{n-1} & l_{n-1}\\
+		&  &  &  & d_{n} & k_{n} & l_{n} \\
+	\end{bmatrix} \\
+	$$
+	$$U = \begin{bmatrix}
+	1 & u_1 & w_1\\
+	& 1 & u_2 & w_2\\
+	&  & 1 & u_3 & w_3\\
+	&  &  & \ddots  & \ddots & \ddots\\
+	&  &  &  & 1 & u_{n-2} & w_{n-2}\\
+	&  & &  &  & 1 & u_{n-1} \\
+	&  &  &  &  &  & 1 \\
+	\end{bmatrix}$$
+	Given this assumption we can calculate the unknown quantities $l_j, k_j, u_j$ and $w_j$ as follows. \\
+	\emph{Step 1:} 
+	\begin{align*}
+		l_1 &= a_1 \\
+		u_1 &= c_1/l_1 \\
+		w_1 & = e_1/l_1
+	\end{align*}
+	\emph{Step 2:} 
+	\begin{align*}
+		k_2 &= b_2 \\
+		l_2 &= a_2 - k_2u_1 \\
+		u_2 &= (c_2 - k_2w_1)/l_2 \\
+		w_2 & = e_2/l_2
+	\end{align*}
+	\emph{Step $j$:} 
+	\begin{align*}
+		k_j &= b_j - d_ju_{j-2} \\
+		l_j &= a_j - d_jw_{j-2} - k_ju_{j-1} \\
+		u_j &= (c_j - b_jw_{j-1})/l_j \\
+		w_j & = e_j/l_j
+	\end{align*}
+	\emph{Step $n-1$:} 
+	\begin{align*}
+		k_{n-1} &= b_{n-1} - d_{n-1}u_{n-3} \\
+		l_{n-1} &= a_{n-1} - d_{n-1}w_{n-3} - k_{n-1}u_{n-2} \\
+		u_{n-1} &= (c_{n-1} - b_{n-1}w_{n-2})/l_{n-1} \\
+	\end{align*}
+	\emph{Step $n$:} 
+	\begin{align*}
+		k_n &= b_n - d_nu_{n-2} \\
+		l_n &= a_n - d_nw_{n-2} - k_nu_{n-1} \\
+	\end{align*}
+	
+	Once factored, we now have the system $LU\vec{x}=\vec{v}$. We will substitue $U\vec{x}=\vec{y}$ so that we may first solve $L\vec{y}=\vec{v}$. We can do this forward substitution very quickly as follows\\
+	\emph{Step 1:} $y_1 = v_1/l_1$ \\
+	\emph{Step 2:} $y_2 = (v_2-k_2y_1)/l_2$ \\
+	\emph{Step $j$:} $y_j = (v_j - d_jy_{j-2} - k_jy_{j-1})/l_j$.
+	Finally we do back substitution on the system $U\vec{x}= \vec{y}$ to obtain our solution.\\
+	\emph{Step $n$:} $x_n = y_n$ \\
+	\emph{Step $n-1$:} $x_{n-1} = y_{n-1} - u_{n-2}x_{n-1}$ \\
+	\emph{Step $j$:} $x_j = y_j - u_jx_{j+1} - w_jx_{j+2}$. \\
+	This will solve the system of equations in $\mathcal{O}(n)$ time.
+	
+\problem{4. (b)} Determine the exact number of operations your algorithm requires.
+
+	In the tables below we can see the flop coutns at each step and the number of times the step is performed
+	\begin{center}
+		\begin{tabular}{|c|c|c|}\hline
+			\multicolumn{3}{|c|}{LU Factorization} \\ \hline
+			\emph{Step}&FLOP count&times \\ \hline
+			1 &2 & 1 \\ \hline
+			2 &6 & 1 \\ \hline
+			$j$ & 10 & $n-4$ \\ \hline
+			$n-1$ & 9 & 1 \\ \hline
+			$n$ & 6 & 1 \\ \hline
+		\end{tabular}
+	\end{center}
+	\begin{center}
+		\begin{tabular}{|c|c|c|}\hline
+			\multicolumn{3}{|c|}{Forward Substitution} \\ \hline
+			\emph{Step}&FLOP count&times \\ \hline
+			1 &1 & 1 \\ \hline
+			2 &2 & 1 \\ \hline
+			$j$ & 5 & $n-2$ \\ \hline
+		\end{tabular}
+	\end{center}
+	\begin{center}
+		\begin{tabular}{|c|c|c|}\hline
+			\multicolumn{3}{|c|}{Backward Substitution} \\ \hline
+			\emph{Step}&FLOP count&times \\ \hline
+			$n$ &0 & 1 \\ \hline
+			$n-1$ &2 & 1 \\ \hline
+			$j$ & 4 & $n-2$ \\ \hline
+		\end{tabular}
+	\end{center}
+	This gives us $19n-30$ operations for the factorization (note that this is only an accurate count for $n \geq 3$ since this that is the minimum for a penta-diagonal system).
+	
+\problem{4. (c)} Implement your algorithm. \\
+
+	\begin{lstlisting}
+def penta_solve(P,v):
+	n = P.shape[0]
+	a = P.diagonal(0)
+	b = np.zeros(n)
+	b[1:n] = P.diagonal(-1)
+	c = P.diagonal(1)
+	d = np.zeros(n)
+	d[2:n] = P.diagonal(-2)
+	e = P.diagonal(2)
+	l = np.zeros(n)
+	u = np.zeros(n-1)
+	w = np.zeros(n-2)
+	k = np.zeros(n)
+	#step 1
+	l[0] = a[0]
+	u[0] = c[0]/l[0]
+	w[0] = e[0]/l[0]
+	#step 2
+	k[1] = b[1]
+	l[1] = a[1]-k[1]*u[0]
+	u[1] = (c[1]-b[1]*w[0])/l[1]
+	w[1] = e[1]/l[1]
+	#step j
+	for j in range(2,n-2):
+		k[j] = b[j] - d[j]*u[j-2]
+		l[j] = a[j] - d[j]*w[j-2] - k[j]*u[j-1]
+		u[j] = (c[j]-k[j]*w[j-1])/l[j]
+		w[j] = e[j]/l[j]
+	#step n-1
+	k[n-2] = b[n-2] - d[n-2]*u[n-2-2]
+	l[n-2] = a[n-2] - d[n-2]*w[n-2-2] - k[n-2]*u[n-2-1]
+	u[n-2] = (c[n-2]-k[n-2]*w[n-2-1])/l[n-2]
+	#step n
+	k[n-1] = b[n-1] - d[n-1]*u[n-1-2]
+	l[n-1] = a[n-1] - d[n-1]*w[n-1-2] - k[n-1]*u[n-1-1]
+	#forward sub L
+	y = np.zeros(n)
+	#step 1
+	y[0] = v[0]/l[0]
+	#step 2
+	y[1] = (v[1]-k[1]*y[0])/l[1]
+	#step j
+	for j in range(2,n):
+		y[j] = (v[j] - d[j]*y[j-2] - k[j]*y[j-1])/l[j]
+	#back sub U
+	x = np.zeros(n)
+	#step n
+	x[n-1] = y[n-1]
+	#step n-1
+	x[n-2] = y[n-2] - u[n-2]*x[n-1]
+	#step j
+	for j in range(n-3, -1, -1):
+		x[j] = y[j] - u[j]*x[j+1] - w[j]*x[j+2]
+	return x
+	\end{lstlisting}
+	
+\problem{4. (d)} Test your code from part (c) on the matrices specified on the HW. \\
+	
+	\begin{lstlisting}
+def p4d_helper(n):
+	a = [i for i in range(1,n+1)]
+	b = [-(i+1)/3 for i in range(1, n)]
+	d = [-(i+2)/6 for i in range(1,n-1)]
+	P = np.zeros( (n,n) )
+	P += np.diag(a, 0)
+	P += np.diag(b, 1)
+	P += np.diag(b, -1)
+	P += np.diag(d, 2)
+	P += np.diag(d, -2)
+	f = np.zeros( (n,1) )
+	f[0] = .5
+	f[1] = 1/6.0
+	f[n-2] = 1/6.0
+	f[n-1] = .5
+	return P, f
+
+def p4d():
+	for n in [100, 1000]:
+		P,f = p4d_helper(n)
+		x = penta_solve(P,f)
+		r = P.dot(x)-f
+		print('residual %f' % r.transpose().dot(r))
+		dif = x - solve(P,f)
+		print('GE %f' % dif.transpose().dot(dif))
+
+#output
+>>> p4d()
+residual 0.000000
+GE 0.000000
+residual 0.000000
+GE 0.000000
+	\end{lstlisting}
+	Regular Gaussian elimination gives the same solution as our algorithm, thus we can conclude that it is correct.
+	
+	
+\problem{5. (a)} Does a small residual imply that the vector is close to the true solution of the system? \\
+
+	No. The error on $\hat{x}$ can be understood through the following relationship 
+	$$
+	\frac{\norm{x - \hat{x}}}{\norm{x}} \leq \kappa(A)\frac{\norm{A\hat{x}-b}}{\norm{b}}
+	$$
 
 \end{document}
