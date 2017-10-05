@@ -659,9 +659,22 @@ B(:,21)=1
 [A,p,g] = lupp_growth(B)
 	\end{lstlisting}
 	
-	The growth factor for $A$ is $g_21(A)=1,048,576 = 2^{20}$ as expectted.
+	The growth factor for $A$ is $g_21(A)=1,048,576 = 2^{20}$ as expected.
 	
 \problem{6 (c)} Show that the growth for the general $n$-by-$n$ case is exactly $g_n(A)=2^{n-1}$.
+
+	\begin{proof}
+		We will denote the matrix $A$ at the $i-1$th step of Gaussian elimination as $A^{(i)}$. Then $A^{(1)} = A$. 
+		Note that $\max\limits_{1\leq i,j\leq n}\lvert A_{i,j}\rvert = 1$. For the first step in Gaussian elimination, the multiplier for each row is easily seen to be $1$. Also the first row of $A$ is zeros except $A_{1,1}=1$ and $A_{1,n}=1$. Thus the first step of Gaussian elimination will only change the first and second element of each row after the first. For the first step of Gaussian elimination, the multiplier for each row is $1$ since for $ 2 \leq j \leq n$ $A_{j,1}=-1$. Thus $A^{(2)}_{j,n} = A_{j,n} + 1A_{j,1} = 2$. Of course $A^{(2)}_{j,1}=0$ as well. Since $A_{1,i}=1$ for $2 \leq i \leq n-1$ all other entries of $A^{(2)}$ remain the same. Thus $\max\limits_{1\leq i,j\leq n}\lvert A^{(2)}_{i,j}\rvert = 2$. Suppose that after the $k$th step of Gaussian elimination we know that for $k < j \leq n$ that $A^{(k)}_{j,n}= 2^{k-1}$. Suppose also that the lower triangle of $A^{(k)}$ is the same as $A$ except for the zeros introduced by Gaussian elimination. Further suppose that for $k < i < n$ that $A^{(k)}_{j,i}= 0$. Then $\max\limits_{1\leq i,j\leq n}\lvert A^{(k)}_{i,j}\rvert = 2^{k-1}$. It is again easy to see that the multiplier for each row is $1$ and for each row $j$ where $j$ where $k < j \leq n$, the only elements that change are $A^{(k+1)}_{j,k}= 0$ and 
+		\begin{align*}
+			A^{(k+1)}_{j,n} &= A^{(k)}_{j,n} + 1A^{(k)}_{k,n} \\
+			& = 2^{k-1} + 2^{k-1} \\
+			& = 2^{k} \\
+			& = 2^{(k+1)-1}
+		\end{align*}
+		Thus $\max\limits_{1\leq i,j\leq n}\lvert A^{(k+1)}_{i,j}\rvert = 2^{(k+1)-1}$. By induction $\max\limits_{1\leq i,j\leq n}\lvert A^{(k)}_{i,j}\rvert = 2^{k-1}$ for $1 \leq k \leq n$. Then $\max\limits_{1\leq k,i,j\leq n}\lvert A^{(k)}_{i,j}\rvert = \max\limits_{1\leq k\leq n}2^{k-1} = 2^{n-1}$. \\
+		Thus $g_n(A)=2^{n-1}$.		
+	\end{proof}
 
 \problem{7 (a)} Modify the code on the course webpage to do Gaussian elimination with complete pivoting.
 
