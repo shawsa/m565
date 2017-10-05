@@ -690,7 +690,54 @@ A(J,J) = A(J,J) - A(J,k)*A(k,J);
 end
 end
 
-
+function [x] = gecp(A,b)
+n = size(A,1);
+[LU,p,q] = lucp(A);
+new_b = b;
+P = zeros(n,n);
+for i=1:n
+P(p(i),i)=1;
+end
+Q = zeros(n,n);
+for i=1:n
+Q(i,q(i))=1;
+end
+x = Q'*backsub(LU,forsub(LU,P'*b));
 	\end{lstlisting}
+	
+\problem{7 (b)} Solve the system provided. Report the max-norm of the residual and the error.
+
+	The following MATLAB code finds solutions using both partial and complete pivoting, and then checks their residual and error using the known solution $x=[0, \dots , 0, 1]^T$.
+	\begin{lstlisting}
+n = 12;
+A = zeros(n,n);
+b = zeros(n,1);
+for i=1:n
+b(i,1) = i^(n-1);
+for j=1:n
+A(i,j) = i^(j-1);
+end
+end
+x = zeros(n,1);
+x(n,1) = 1;
+
+xhatcp = gecp(A,b);
+xhatpp = gepp(A,b);
+
+'xhatCP residual'
+norm(b-A*xhatcp,Inf)
+'xhatCP error'
+norm(x-xhatcp,Inf)
+
+'xhatPP residual'
+norm(b-A*xhatpp,Inf)
+'xhatPP error'
+norm(x-xhatpp,Inf)
+	\end{lstlisting}
+	Gaussian elimination with complete pivoting finds the exact answer $x=[0, \dots , 0, 1]^T$. Both the residual and the error are zero vectors so the max norm of each is zero.
+	
+\problem{7 (c)} Compare the results from part (b) with Gaussian elimination using partial pivoting.
+
+	From the code in part (b) we get that the residual for GE with parital pivoting is fairly small $r= 0.00012207$, but the error is large $error = 0.0752$. Both are much worse than GE with complete pivoting. 
 
 \end{document}
