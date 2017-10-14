@@ -1,0 +1,120 @@
+\documentclass[12pt]{article}
+
+%***************************************************************************************************
+% Math
+\usepackage{fancyhdr} 
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{dsfont}
+
+%***************************************************************************************************
+% Macros
+\usepackage{calc}
+
+%***************************************************************************************************
+% Commands and Custom Variables	
+\newcommand{\problem}[1]{\hspace{-4 ex} \large \textbf{Problem #1} }
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\sint}{\text{s}\kern-5pt\int}
+\newcommand{\powerset}{\mathcal{P}}
+\renewenvironment{proof}{\hspace{-4 ex} \emph{Proof}:}{\qed}
+
+%***************************************************************************************************
+%page
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\doublespacing
+\allowdisplaybreaks
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Shaw \space \thepage}
+\setlength\parindent{0pt}
+
+%***************************************************************************************************
+%Code
+\usepackage{listings}
+\usepackage{courier}
+\lstset{
+	language=Python,
+	showstringspaces=false,
+	formfeed=newpage,
+	tabsize=4,
+	commentstyle=\itshape,
+	basicstyle=\ttfamily,
+}
+
+%***************************************************************************************************
+%Images
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
+%tikz
+\usepackage[utf8]{inputenc}
+\usepackage{pgfplots}
+
+%***************************************************************************************************
+%Hyperlinks
+%\usepackage{hyperref}
+%\hypersetup{
+%	colorlinks=true,
+%	linkcolor=blue,
+%	filecolor=magenta,      
+%	urlcolor=cyan,
+%}
+
+
+\begin{document}
+	\thispagestyle{empty}
+	
+	\begin{flushright}
+		Sage Shaw \\
+		m565 - Fall 2017 \\
+		\today
+	\end{flushright}
+	
+{\large \textbf{HW 4}}\bigbreak
+
+%***************************************************************************************************
+\singlespacing
+\problem{1} We write Lagrange's interpolation formula as 
+$$ \sum\limits_{j=0}^n l_j(x)f(x_j)  $$
+Show that 
+\begin{align}
+	\sum\limits_{j=0}^n l_j(x)x_j \equiv x
+\end{align}
+	
+	\doublespacing
+	\begin{proof}
+		Consider the function $f(x)=x$. Given the sample points $\{x_j\}_{0=j}^n$, $f(x_j)=x_j$. Since $f$ is a polynomial, it is the polynomial that interpolates the points $\Big \{ \big(x_j,f(x_j) \big) \Big\}_{0=j}^n$ and thus
+		$$ \sum\limits_{j=0}^n l_j(x)x_j = \sum\limits_{j=0}^n l_j(x)f(x_j) = f(x) = x$$
+	\end{proof}
+
+
+%***************************************************************************************************
+\singlespacing
+\problem{2} Let $$E_1(x) = \int_{x}^{\infty}\frac{e^{-t}}{t}dt \ \ x>0$$ 
+We would like to construct a table of values over the interval $x \in [1,10]$ such that the second degree polynomial interpolation between any three adjacent points in the table will give an error less than or eaual to $10^{-8}$.
+
+	We will use the error formula
+	$$
+	\vert P_2(x) - f(x) \vert \leq \frac{\vert (x-x_0)(x-x_1)(x-x_2) \vert}{3!} \max_{a\leq x \leq b} \big\vert f^{(3)}(x) \big\vert
+	$$
+	First we will find the maximum of the third derivative over $1 \leq x \leq 10$.
+	\begin{align*}
+		f^{\prime}(x) & = \frac{d}{dx} \int_{x}^{\infty}\frac{e^{-t}}{t}dt \\
+		& = \frac{d}{dx} -\int_{\infty}^{x}\frac{e^{-t}}{t}dt \\
+		& = -\frac{e^{-x}}{x} \\
+		& = -x^{-1}e^{-x} \\
+		f^{\prime\prime}(x) & = \frac{d}{dx} -x^{-1}e^{-x} \\
+		& = x^{-2} e^{-x} + x^{-1}e^{-x} \\
+		f^{(3)}(x) & = \frac{d}{dx} (x^{-2} e^{-x} + x^{-1}e^{-x}) \\
+		& = -2x^{-3}e^{-x} - x^{-2} e^{-x} - x^{-2} e^{-x} - x^{-1}e^{-x} \\
+		& = -2x^{-3}e^{-x} - 2x^{-2} e^{-x} - x^{-1}e^{-x} \\
+		& = (-2x^{-3} - 2x^{-2} - x^{-1}) e^{-x}
+	\end{align*}
+
+\end{document}
