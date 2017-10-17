@@ -7,7 +7,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
-\usepackage{dsfont}
+%\usepackage{dsfont}
 
 %***************************************************************************************************
 % Macros
@@ -27,7 +27,7 @@
 %page
 \usepackage[margin=1in]{geometry}
 \usepackage{setspace}
-\doublespacing
+%\doublespacing
 \allowdisplaybreaks
 \pagestyle{fancy}
 \fancyhf{}
@@ -97,7 +97,7 @@ Show that
 %***************************************************************************************************
 \singlespacing
 \problem{2} Let $$E_1(x) = \int_{x}^{\infty}\frac{e^{-t}}{t}dt \ \ x>0$$ 
-We would like to construct a table of values over the interval $x \in [1,10]$ such that the second degree polynomial interpolation between any three adjacent points in the table will give an error less than or eaual to $10^{-8}$.
+We would like to construct a table of values over the interval $x \in [1,10]$ such that the second degree polynomial interpolation between any three adjacent points in the table will give an error less than or equal to $10^{-8}$.
 
 	We will use the error formula
 	$$
@@ -116,5 +116,106 @@ We would like to construct a table of values over the interval $x \in [1,10]$ su
 		& = -2x^{-3}e^{-x} - 2x^{-2} e^{-x} - x^{-1}e^{-x} \\
 		& = (-2x^{-3} - 2x^{-2} - x^{-1}) e^{-x}
 	\end{align*}
+	This function has no local extrema except at the end points. It is clear that the maximum value of the absolute value of the third derivative is at $x=1$, thus $\max_{1\leq x \leq 10} \big\vert f^{(3)}(x) \big\vert = \tfrac{5}{e}$. \bigbreak
+	
+	Next we will find the maximum value of $\vert (x-x_0)(x-x_1)(x-x_2) \vert$ over our interval. Note that if $x$ is one of our data points, this product is zero. Without loss of generality we can assume that $x_0 < x < x_1$ for some ordered points $x_0 < x_1 < x_2$. Since all of our points are equally spaced, $\vert x_0 - x_1 \vert = \vert x_1 - x_2 \vert = h$ where $h$ is the step size in our table. Letting $ x-x_0 = w$ we have the following substitutions $ x_1-x = h-w, x_2 - x = 2h - w$. Now our problem is to find the maximum value of $ w(w-h)(w-2h)$ for $ 0 \leq w \leq h$. Note that each term is positive so we may drop the absolute. Distributing we have $w^3 - 3w^2h + 2wh^2$. To maximize this we find the root of the derivative $3w^2 + 6wh + 2h^2$. Applying the quadratic formula we find that our function has a maximum at 
+	$$
+	w = \frac{-6h \pm \sqrt{(6h)^2 - 4(3)(2h^2)}}{2(3)} = h \frac{3-\sqrt{3}}{3}
+	$$
+	Substituting this back in we have the maximum value
+	$$
+	(h \tfrac{3-\sqrt{3}}{3})^3 - 3(h \tfrac{3-\sqrt{3}}{3})^2h + 2(h \tfrac{3-\sqrt{3}}{3})h^2 = \frac{2 \sqrt{3}}{9}h^3
+	$$
+	Finally we get that our error is bounded by
+	$$
+	\vert P_2(x) - f(x) \vert \leq \frac{5\sqrt{3}}{27e}h^3
+	$$
+	If we would like our error to be below $10^{-8}$ we simplify $\frac{5\sqrt{3}}{27e}h^3 < 10^{-8}$ to obtain a maximum step size
+	$$
+	h < \sqrt[3]{\frac{27e10^{-8}}{5 \sqrt{3}}} \approx 0.00439
+	$$
+	
+%***************************************************************************************************
+\singlespacing
+\problem{3}
+
+%***************************************************************************************************
+\problem{4 (a)} Create a program for interpolating data using the the barycentric formula.
+
+	\begin{lstlisting}
+def polyinterp(u, x, y, w=None):
+	if w == None:
+		w = baryweights(x)
+	ret = np.zeros(len(u))
+	for i in range(len(ret)):
+		if u[i] in x:
+			ret[i] = y[np.where(x==u[i])]
+		else:
+			weights = w /(u[i] - x)
+			ret[i] = weights.dot(y)/sum(weights)
+	return ret
+
+def baryweights(x):
+	w = np.ones(len(x))
+	for j, xj in enumerate(x):
+		for xi in x[np.arange(len(x))!=j]: 
+			w[j] /= (xj - xi)
+	return w
+	\end{lstlisting}
+
+%***************************************************************************************************
+\problem{4 (b)}
+
+%***************************************************************************************************
+\problem{5}
+
+%***************************************************************************************************
+\problem{6(a)} Show that the Chebyshev polynomials $T_n(x)=\cos{(n \arccos{x})}$ satisfy the following properties \\
+\emph{i)} $T_n(1) = 1$ \\
+\emph{ii)} $T_n(-1) = (-1)^n$ \\
+\emph{iii)} $T_j(x)T_k(x) = \tfrac{1}{2}[T_{j+k}(x) + T_{j-k}(x)]$ for $j>k\leq 0$. \\
+\emph{iv)} $\frac{T_{n+1}^\prime(x)}{n+1} - \frac{T_{n-1}^\prime(x)}{n-1} = 2T_n(x)$ for $n=1, 2, ...$ \\
+
+	\begin{proof}
+		Clearly $T_n(1) = \cos{(n \arccos{1})} = \cos{(n*0)} = \cos{(0)} = 1$, and thus we have (\emph{i}). \\
+		In a similar fashion $T_n(-1) = \cos{(n \arccos{-1})} = \cos(n\pi)$ If $n$ is even $T_n(-1) = 1$ and if $n$ is odd then $T_n(-1)=-1$. This is also the case for $(-1)^n$. Thus $T_n(-1) = (-1)^n$ and we have (\emph{ii}). \\
+		
+	\end{proof}
+
+%***************************************************************************************************
+\problem{6 (b)} Prove that the Chebyshev polynomials are solutions to the differential equation
+	
+	\begin{align}\label{p1eq2}
+	(1-x^2)y^{\prime\prime}-xy^\prime+n^2y=0
+	\end{align}
+	
+	\begin{proof}
+		Note that if $y = T_n(x)$, then
+		\begin{align*}
+		y^\prime & = -\sin{(n \arccos{x})} \tfrac{d}{dx}(n \arccos{x}) \\
+		& = -\sin{(n \arccos{x})} (-n)(1-x^2)^{-\frac{1}{2}} \\
+		& = n(1-x^2)^{-\frac{1}{2}}\sin{(n \arccos{x})}  \\
+		y^{\prime\prime} &= -\tfrac{n}{2}(1-x^2)^{-\frac{3}{2}}(-2x)\sin{(n \arccos{x})} + n(1-x^2)^{-\frac{1}{2}}\cos{(n \arccos{x})}(-n)(1-x^2)^{-\frac{1}{2}} \\
+		&= nx(1-x^2)^{-\frac{3}{2}}\sin{(n \arccos{x})} - n^2(1-x^2)^{-1}\cos{(n\arccos{x})}
+		\end{align*}
+		Then 
+		\begin{align*}
+		(1-x^2)y^{\prime\prime} & = (1-x^2) \Big( nx(1-x^2)^{-\frac{3}{2}}\sin{(n \arccos{x})} - n^2(1-x^2)^{-1}\cos{(n\arccos{x})} \Big) \\
+		& = nx(1-x^2)^{-\frac{1}{2}}\sin{(n \arccos{x})} - n^2\cos{(n\arccos{x})} \\
+		-xy^\prime & = -x n(1-x^2)^{-\frac{1}{2}}\sin{(n \arccos{x})} \\
+		n^2y & = n^2\cos{(n \arccos{x})}
+		\end{align*}
+		Clearly these terms sum to zero and we have our result $(1-x^2)y^{\prime\prime}-xy^\prime+n^2y=0$. Thus $T_n$ are solutions to (\ref{p1eq2}).
+		
+	\end{proof}
+
+%***************************************************************************************************
+\singlespacing
+\problem{7}
+
+%***************************************************************************************************
+\singlespacing
+\problem{8}
+	
 
 \end{document}
