@@ -51,10 +51,12 @@
 %Images
 \usepackage{graphicx}
 \graphicspath{ {images/} }
+\usepackage{float}
 
 %tikz
 \usepackage[utf8]{inputenc}
 \usepackage{pgfplots}
+\usepgfplotslibrary{groupplots}
 
 %***************************************************************************************************
 %Hyperlinks
@@ -164,22 +166,230 @@ def baryweights(x):
 	\end{lstlisting}
 
 %***************************************************************************************************
-\problem{4 (b)}
+\problem{4 (b)} Using equispaced points, the Chebyshev points of the first and second kind, and Legendre points, interpolate $f(x) = \sqrt{x^2 +.1}$ using 15 points. Evaluate it at 201 equally spaced points on the interval $[-1,1]$, and plot the error. Decide which point set produces the best result?
+
+	\begin{lstlisting}
+def p4b():
+	samples = []
+	labels = []
+	x = np.linspace(-1,1,15)
+	samples.append(x)
+	labels.append('Equispaced points:')
+	x = []
+	for j in range(0,15):
+		x.append( -1* np.cos( (2*j+1)/29 * np.pi))
+	samples.append(np.array(x))
+	labels.append('First kind Chebyshev points:')
+	x = []
+	for j in range(0,15):
+		x.append( -1* np.cos( (j*np.pi)/14 ) )
+	samples.append(np.array(x))
+	labels.append('Second kind Chebyshev points:')
+	x = [-0.987992518020485,
+			-0.394151347077563,
+			0.570972172608539,
+			-0.937273392400706,
+			-0.201194093997435,
+			0.724417731360170,
+			-0.848206583410427,
+			0,
+			0.848206583410427,
+			-0.724417731360170,
+			0.201194093997435,
+			0.937273392400706,
+			-0.570972172608539,
+			0.394151347077563,
+			0.987992518020485]
+	samples.append(np.array(x))
+	labels.append('Legendre points:')
+	for x, l in zip(samples, labels):
+		y = p4_foo(x)
+		u = np.linspace(-1,1,201)
+		p = polyinterp(u, x, y)
+		f = p4_foo(u)
+		print(l)
+		print('Eucidian norm: %f' % np.linalg.norm(f-p))
+		print('Infinity norm: %f' % np.linalg.norm(f-p,np.inf))
+		plt.subplot(2,1,1)
+		plt.plot(u,p, 'r-')
+		plt.plot(u,f, 'k-')
+		plt.plot(x,y, 'bo')
+		plt.xlim( (-1, 1) )
+		plt.ylim( (.2, 1.2) )
+		
+		plt.subplot(2,1,2)
+		plt.plot(u, p-f, 'k-')
+		plt.xlim( (-1, 1) )
+		y_range = np.max( np.abs(p-f) )
+		plt.ylim( (-y_range, y_range) )
+		plt.show()
+	\end{lstlisting}
+	
+	The code above gives the following output.
+	\begin{lstlisting}
+Equispaced points:
+Eucidian norm: 0.084877
+Infinity norm: 0.024440
+First kind Chebyshev points:
+Eucidian norm: 0.001919
+Infinity norm: 0.000347
+Second kind Chebyshev points:
+Eucidian norm: 0.001945
+Infinity norm: 0.000266
+Legendre points:
+Eucidian norm: 0.001945
+Infinity norm: 0.000621
+	\end{lstlisting}
+	
+	\begin{figure}[H]
+		\caption{Equispaced points}
+		\includegraphics[width=0.80\textwidth]{hw4_figure_1}
+		\centering
+	\end{figure}
+	\begin{figure}[H]
+		\caption{First kind Chebyshev points}
+		\includegraphics[width=0.80\textwidth]{hw4_figure_2}
+		\centering
+	\end{figure}
+	\begin{figure}[H]
+		\caption{Second kind Chebyshev points}
+		\includegraphics[width=0.80\textwidth]{hw4_figure_3}
+		\centering
+	\end{figure}
+	\begin{figure}[H]
+		\caption{Legendre points}
+		\includegraphics[width=0.80\textwidth]{hw4_figure_4}
+		\centering
+	\end{figure}
+%	\includegraphics[width=0.85\textwidth]{hw4_figure_2} \\
+%	\includegraphics[width=.85\textwidth]{hw4_figure_3} \\
+%	\includegraphics[width=.85\textwidth]{hw4_figure_4} \\
+%	%\input{images/hw4_figure_1_tikz}
+
+	In each of the four figures the top subplot has the function $f(x) = \sqrt{x^2 + .1}$  in black, along with the interpolating polynomial in red, and the sample points in blue. The bottom subplot has the difference between the function and the interpolating polynomial. Note that the interpolating polynomial is so close to the function in figures 2-3 that it is not visible. \bigbreak
+	
+	Based off of the 2-norm and the $\infty$-norm any of these pointsets other than the equispaced very closely approximates our function. The Chebyshev points of the first kind minimize the 2-norm, and the Chebyshev points of the second kind minimize the infinity norm. It should be noted that from the graph of the error when choosing the Legendre points, we can see that the error is smaller than both kinds of Chebyshev points when not near the ends of the interval. One might gather that the Legendre points are the best choice when our function need not be evaluated near the end points. \bigbreak
+	
+%***************************************************************************************************
+\problem{4 (c)} Show that for equally spaced points between $[-1,1]$, that 
+$$
+w_j = \frac{ (\tfrac{n}{2})^n (-1)^{n-j} }{ n! }  {{n}\choose{j}}
+$$
+
+	\begin{proof}
+		Choose $x_j = -1 + \tfrac{2j}{n}$ for $j = 0, 1, \dots, n$.
+		\begin{align*}
+			w_j^{-1} & = \prod_{i=0}^{j-1}(x_j - x_i) \prod_{i=j+1}^{n}(x_j - x_i) \\
+			& = \prod_{i=0}^{j-1} \frac{2(j-i)}{n} \prod_{i=j+1}^{n} \frac{(-1)2(i-j)}{n} \\
+			& = \frac{ 2^{j} (j)!}{ n^{j-1}} \frac{(-1)^{n-j} 2^{n-j} (n-j)!}{ n^{n-j}} \\
+			& = \big( \tfrac{2}{n} \big)^{n} (-1)^{n-j} (j)! (n-j)!
+		\end{align*}
+		Then
+		$$
+		w_j = w_j \frac{n!}{n!} = \frac{ (\tfrac{n}{2})^n (-1)^{n-j} }{ n! } \frac{n!}{j!(n-j)!} = \frac{ (\tfrac{n}{2})^n (-1)^{n-j} }{ n! }  {{n}\choose{j}}
+		$$
+	\end{proof}
 
 %***************************************************************************************************
-\problem{5}
+\problem{5 (a)} The only set of specifications you get from SNCF say that the switching path is supposed
+to pass through the points $(0, 0), (2, 1)$, and $(4, 2)$. Write down the interpolating polynomial
+to this data in both Lagrange form Newton divided difference form (you don’t
+need to simplify these). Plot the resulting curve for the train path (using some software
+package like Matlab) and include the horizontal lines $y = 0$ and $y = 2$ in your plot.
+Also, report the value of the slope of the path at the point $x = 2$. Turn in your work for
+computing the polynomial, the plots, and the slope.
+
+	The Lagrange polynomial is expressed as follows:
+	$$
+	P_2(x) = 0 \frac{ (x-2)(x-4) }{(0-2)(0-4) } + 1 \frac{ (x-0)(x-4) }{(2-0)(2-4) } + 2 \frac{ (x-0)(x-2) }{(4-0)(4-2) } \\
+	$$
+
+	For the Newton divided difference form we must first calculate the divided difference table.
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}\hline
+			$x_i$ & $f(x_i)$ & $f[x_{i-1},x_i]$ & $f[x_{i-2}, x_{i-1}, x_i]$ \\ \hline
+			0 &0 & & \\ \hline
+			2 &1 & $\tfrac{1}{2}$ & \\ \hline
+			4 &2 & $\tfrac{1}{2}$ & 0 \\ \hline
+		\end{tabular}
+	\end{center}
+	
+	Then the Newton divided difference form is
+	$$
+	P_2(x) = 0 + \tfrac{1}{2}(x-0) + 0(x-0)(x-2)
+	$$
+	
+	From the data it is obvious that the interpolating polynomial is just the straight line $y=\tfrac{1}{2}x$ wich has a slope of $\tfrac{1}{2}$. The plot below confirms this.	
+	\begin{figure}[H]
+		\caption{The interpolating polynomial}
+		\includegraphics[width=0.75\textwidth]{hw4_figure_5}
+		\centering
+		\label{fig:p5a}
+	\end{figure}
+	In figure \ref{fig:p5a}, the interpolating polynomial is in red, the sample points are in blue, and the train tracks are in black.
+	
+%***************************************************************************************************
+\problem{5 (b)} Adding the constraints that $f^\prime(0) = 0 = f^\prime(4)$ we calculate the divided difference
+
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|c|}\hline
+			$x_i$ & $f(x_i)$ & $f[x_{i-1},x_i]$ & $f[x_{x-2}, x_{i-1}, x_i]$ & $f[ x_{i-3}x_{i-2}, x_{i-1}, x_i]$ & $f[ x_{i-4},\dots, x_i]$ \\ \hline
+			0 &0 & & & & \\ \hline
+			0 &0 & 0 & & & \\ \hline
+			2 &1 & $\tfrac{1}{2}$ & $\tfrac{1}{4}$ & & \\ \hline
+			4 &2 & $\tfrac{1}{2}$ & 0 & $-\tfrac{1}{16}$ & \\ \hline
+			4 &2 & 0 &  $-\tfrac{1}{4}$ & $-\tfrac{1}{16}$ & 0 \\ \hline
+		\end{tabular}
+	\end{center}
+
+	Then our polynomial becomes
+	$$
+	P_4(x) = \tfrac{1}{4}(x-0)^2 - \tfrac{1}{16}(x-0)^2(x-2)
+	$$
+
+	\begin{figure}[H]
+		\caption{The interpolating polynomial with zero slope at the end points}
+		\includegraphics[width=0.75\textwidth]{hw4_figure_6}
+		\centering
+		\label{fig:p5b}
+	\end{figure}
+	In figure \ref{fig:p5b}, the interpolating polynomial is in red, the sample points are in blue, and the train tracks are in black. \bigbreak
+	
+%***************************************************************************************************
+\problem{6(c)} Using the same constraints we can also fit two piecwise polynomials that meet at $(2,1)$ and each haveing slope $1$.
+
+	
+	
 
 %***************************************************************************************************
 \problem{6(a)} Show that the Chebyshev polynomials $T_n(x)=\cos{(n \arccos{x})}$ satisfy the following properties \\
-\emph{i)} $T_n(1) = 1$ \\
-\emph{ii)} $T_n(-1) = (-1)^n$ \\
-\emph{iii)} $T_j(x)T_k(x) = \tfrac{1}{2}[T_{j+k}(x) + T_{j-k}(x)]$ for $j>k\leq 0$. \\
-\emph{iv)} $\frac{T_{n+1}^\prime(x)}{n+1} - \frac{T_{n-1}^\prime(x)}{n-1} = 2T_n(x)$ for $n=1, 2, ...$ \\
+\emph{(i)} $T_n(1) = 1$ \\
+\emph{(ii)} $T_n(-1) = (-1)^n$ \\
+\emph{(iii)} $T_j(x)T_k(x) = \tfrac{1}{2}[T_{j+k}(x) + T_{j-k}(x)]$ for $j>k\leq 0$. \\
+\emph{(iv)} $\frac{T_{n+1}^\prime(x)}{n+1} - \frac{T_{n-1}^\prime(x)}{n-1} = 2T_n(x)$ for $n=1, 2, ...$ \\
 
 	\begin{proof}
 		Clearly $T_n(1) = \cos{(n \arccos{1})} = \cos{(n*0)} = \cos{(0)} = 1$, and thus we have (\emph{i}). \\
+		
 		In a similar fashion $T_n(-1) = \cos{(n \arccos{-1})} = \cos(n\pi)$ If $n$ is even $T_n(-1) = 1$ and if $n$ is odd then $T_n(-1)=-1$. This is also the case for $(-1)^n$. Thus $T_n(-1) = (-1)^n$ and we have (\emph{ii}). \\
 		
+		Recall the trig identity $cos(x)cos(y) = \tfrac{1}{2}[cos(x+y) + cos(x-y)]$, which will be useful in proving (\emph{iii}). Then
+		\begin{align*}
+			T_j(x)T_k(x) & = \cos(j \arccos{x}) \cos(k \arccos{x}) \\
+			& = \tfrac{1}{2}[ \cos(j \arccos{x} + k \arccos{x}) +  \cos(j \arccos{x} k - k \arccos{x}) ] \\
+			& = \tfrac{1}{2}[ \cos( (j + k) \arccos{x}) + \cos( (j - k) \arccos{x}) ]\\
+			& = \tfrac{1}{2}[ T_{j+k}(x) + T_{j-k}(x)]
+		\end{align*}
+		Thus we have (\emph{iii}). \bigbreak
+		
+		For (\emph{iv}) it will be useful to recall that $\sin(x+y) - \sin(x-y) = 2 \cos(x) \sin(y)$ and that $\sin(\arccos(x)) = \sqrt{1-x^2}$. Also note that $T_n^\prime = -\sin{(n \arccos{x})} (-n)(1-x^2)^{-\frac{1}{2}}$. Then
+		\begin{align*}
+			\frac{T_{n+1}^\prime}{n+1} - \frac{T_{n-1}^\prime}{n-1} & = \frac{(n+1) \sin\big((n+1) \arccos(x) \big)}{(n+1)\sqrt{1-x^2}} - \frac{(n-1) \sin\big((n-1) \arccos(x) \big)}{(n-1)\sqrt{1-x^2}} \\
+			& = \frac{ \sin\big((n+1) \arccos(x) \big) - \sin\big((n-1) \arccos(x) \big) } { \sqrt{1-x^2} } \\
+			& =  \frac{2 \cos(n \arccos(x)) \sin(\arccos(x))}{ \sin(\arccos(x))} \\
+			& = 2 T_n(x)
+		\end{align*}
+		Thus we have (\emph{iv}).		
 	\end{proof}
 
 %***************************************************************************************************
