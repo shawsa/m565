@@ -138,8 +138,30 @@ We would like to construct a table of values over the interval $x \in [1,10]$ su
 	$$
 	
 %***************************************************************************************************
-\singlespacing
-\problem{3}
+\problem{3} Finish the divided difference table.
+
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|}\hline
+			$z_i$ & $f[\cdot]$ & $f[\cdot,\cdot]$ & $f[\cdot,\cdot,\cdot]$ & $f[\cdot,\cdot,\cdot,\cdot]$ \\ \hline
+			5 & $f[z_0]$ & & & \\ \hline
+			5 & $f[z_1]$ & $f[z_0,z_1]$ & & \\ \hline
+			6 & 4 & 5 & -3 & \\ \hline
+			4 & 2 & $f[z_2,z_3]$ & $f[z_1,z_2,z_3]$ & $f[z_0,z_1,z_2,z_3]$ \\ \hline
+		\end{tabular}
+	\end{center}
+	From the table $\frac{4-f[z_1]}{6-5} = 5$ so $f[z_1]=-1$. \\
+	Since $z_0=5=z_1$, $f[z_0] = f[z_1] = -1$.
+	The rest of the terms are calculated similarly.
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|}\hline
+			$z_i$ & $f[\cdot]$ & $f[\cdot,\cdot]$ & $f[\cdot,\cdot,\cdot]$ & $f[\cdot,\cdot,\cdot,\cdot]$ \\ \hline
+			5 & -1 & & & \\ \hline
+			5 & -1 & 8 & & \\ \hline
+			6 & 4 & 5 & -3 & \\ \hline
+			4 & 2 & 1 & 4 & -7 \\ \hline
+		\end{tabular}
+	\end{center}
+
 
 %***************************************************************************************************
 \problem{4 (a)} Create a program for interpolating data using the the barycentric formula.
