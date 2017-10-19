@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib2tikz import save as tikz_save
+#from matplotlib2tikz import save as tikz_save
 
 
 def polyinterp(u, x, y, w=None):
@@ -34,7 +34,7 @@ def p4b(tikz=False):
     labels.append('Equispaced points:')
     x = []
     for j in range(0,15):
-        x.append( -1* np.cos( (2*j+1)/29 * np.pi))
+        x.append( -1* np.cos( (2*j+1)/30 * np.pi))
     samples.append( np.sort( np.array(x) ) )
     labels.append('First kind Chebyshev points:')
     x = []
@@ -79,8 +79,8 @@ def p4b(tikz=False):
         plt.xlim( (-1, 1) )
         y_range = np.max( np.abs(p-f) )
         plt.ylim( (-y_range, y_range) )
-        if tikz:
-            tikz_save('images/hw4_figure_' + str(file) + '_tikz.tex')
+        #if tikz:
+            #tikz_save('images/hw4_figure_' + str(file) + '_tikz.tex')
         plt.show()
 
 def p5a():
@@ -110,6 +110,26 @@ def p5b():
     f = .25 * u**2 - 1/16 * u**2 * (u-2)
     
     plt.plot(u,f, 'r-')
+    
+    plt.plot( (0,2,4), (0,1,2), 'bo')
+    plt.plot( (-10,10), (2,2), 'k-')
+    plt.plot( (-10,10), (0,0), 'k-')
+    
+    plt.xlim( (-0.5, 4.5) )
+    plt.ylim( (-.5, 2.5) )
+    
+    plt.show()
+
+def p5c():
+    x = np.array( [0,2,4] )
+    y = np.array( [0,1,2] )
+    
+    u = np.linspace(0,2, 100)
+    f = 1/8 * u**3 - 1/16 * u**3 * (u-2)
+    plt.plot(u,f, 'r-')
+    u = np.linspace(2,4, 100)
+    f = 1 + 1 *(u-2) - 1/4 * (u-2)**2 - 1/16 * (u-2)**2 * (u-4)**2
+    plt.plot(u,f, 'g-')
     
     plt.plot( (0,2,4), (0,1,2), 'bo')
     plt.plot( (-10,10), (2,2), 'k-')

@@ -227,16 +227,16 @@ def p4b():
 	
 	The code above gives the following output.
 	\begin{lstlisting}
-Equispaced points:
+Equispaced points
 Eucidian norm: 0.084877
 Infinity norm: 0.024440
-First kind Chebyshev points:
-Eucidian norm: 0.001919
-Infinity norm: 0.000347
-Second kind Chebyshev points:
+First kind Chebyshev points
+Eucidian norm: 0.001745
+Infinity norm: 0.000205
+Second kind Chebyshev points
 Eucidian norm: 0.001945
 Infinity norm: 0.000266
-Legendre points:
+Legendre points
 Eucidian norm: 0.001945
 Infinity norm: 0.000621
 	\end{lstlisting}
@@ -265,6 +265,9 @@ Infinity norm: 0.000621
 %	\includegraphics[width=.85\textwidth]{hw4_figure_3} \\
 %	\includegraphics[width=.85\textwidth]{hw4_figure_4} \\
 %	%\input{images/hw4_figure_1_tikz}
+
+
+***********************************************************************
 
 	In each of the four figures the top subplot has the function $f(x) = \sqrt{x^2 + .1}$  in black, along with the interpolating polynomial in red, and the sample points in blue. The bottom subplot has the difference between the function and the interpolating polynomial. Note that the interpolating polynomial is so close to the function in figures 2-3 that it is not visible. \bigbreak
 	
@@ -346,6 +349,15 @@ computing the polynomial, the plots, and the slope.
 	$$
 	P_4(x) = \tfrac{1}{4}(x-0)^2 - \tfrac{1}{16}(x-0)^2(x-2)
 	$$
+	
+	We can simplify this and take the derivative
+	\begin{align*}
+		P_4(x) & = \tfrac{1}{4}(x-0)^2 - \tfrac{1}{16}(x-0)^2(x-2) \\
+		& = \tfrac{1}{4}x^2 - \tfrac{1}{16}x^3 + 2\tfrac{1}{16}x^2 \\
+		& = \tfrac{3}{8}x^2 - \tfrac{1}{16}x^3\\
+		P_4^\prime(x) = \tfrac{3}{4}x - \tfrac{3}{16}x^2
+	\end{align*}
+	Then our derivative at $x=2$ is $P_4^\prime(2) = \tfrac{3}{4}$.
 
 	\begin{figure}[H]
 		\caption{The interpolating polynomial with zero slope at the end points}
@@ -356,7 +368,39 @@ computing the polynomial, the plots, and the slope.
 	In figure \ref{fig:p5b}, the interpolating polynomial is in red, the sample points are in blue, and the train tracks are in black. \bigbreak
 	
 %***************************************************************************************************
-\problem{6(c)} Using the same constraints we can also fit two piecwise polynomials that meet at $(2,1)$ and each haveing slope $1$.
+\problem{6(c)} Using the same constraints we can also fit two piecewise polynomials that meet at $(2,1)$ and each having slope $1$. Additionally add the condition that the curves have a second derivative of zero at the ends.
+
+	First we construct the divided difference table for the first piece.
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|c|}\hline
+			$x_i$ & $f(x_i)$ & $f[x_{i-1},x_i]$ & $f[x_{x-2}, x_{i-1}, x_i]$ & $f[ x_{i-3}x_{i-2}, x_{i-1}, x_i]$ & $f[ x_{i-4},\dots, x_i]$ \\ \hline
+			0 & 0 & & & & \\ \hline
+			0 & 0 & 0 & & & \\ \hline
+			0 & 0 & 0 & 0 & & \\ \hline
+			2 & 1 & $\tfrac{1}{2}$ & $\tfrac{1}{4}$ & $\tfrac{1}{8}$ & \\ \hline
+			2 & 1 & 1 &  $\tfrac{1}{4}$ & 0 & $-\tfrac{1}{16}$ \\ \hline
+		\end{tabular}
+	\end{center}
+	
+	This gives us the equation $P_4(x) = \tfrac{1}{8}(x-0)^3 - \tfrac{1}{16}(x-0)^3(x-2)$ for $0 \leq x \leq 2$. Next we find calculate the divided difference table for the second piece.
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|c|c|}\hline
+			$x_i$ & $f(x_i)$ & $f[x_{i-1},x_i]$ & $f[x_{x-2}, x_{i-1}, x_i]$ & $f[ x_{i-3}x_{i-2}, x_{i-1}, x_i]$ & $f[ x_{i-4},\dots, x_i]$ \\ \hline
+			2 & 1 & & & & \\ \hline
+			2 & 1 & 1 & & & \\ \hline
+			4 & 2 & $\tfrac{1}{2}$ & $-\tfrac{1}{4}$ & & \\ \hline
+			4 & 2 & 0 & $-\tfrac{1}{4}$ & 0 & \\ \hline
+			4 & 2 & 0 &  0 & $\tfrac{1}{8}$ & $\tfrac{1}{16}$ \\ \hline
+		\end{tabular}
+	\end{center}
+	This gives us the polynomial $Q_4(x) = 1 + 1(x-2) - \tfrac{1}{4}(x-2)^2 + \tfrac{1}{16}(x-2)^2(x-4)^2$ where $2 \leq x \leq 4$. In figure \ref{fig:p5c}, $P_4$ is in red, $Q_4$ is in green, the sample points are in blue, and the train tracks are in black. \bigbreak
+	\begin{figure}[H]
+		\caption{The interpolating polynomial with zero slope at the end points}
+		\includegraphics[width=0.75\textwidth]{hw4_figure_7}
+		\centering
+		\label{fig:p5c}
+	\end{figure}
+	In figure 
 
 	
 	
