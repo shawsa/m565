@@ -233,7 +233,7 @@ def p6b():
     plt.show()
     
 def p6c_helper(t):
-    return np.sin(np.exp(np.cos(t - .5)))
+    return np.sin(20*np.exp(np.cos(t - .5)))
     
 def p6c():
     k = np.linspace(0, 2*np.pi, 101, endpoint=False)
@@ -260,14 +260,15 @@ def p6c():
     plt.plot( (0,0), (-100, 100), 'k-')
     plt.plot( x, f - p6c_helper(x), 'r-')
     plt.xlim( (-.1, 2*np.pi+.1) )
-    plt.ylim( (-2e-15, 2e-15) )
+    plt.ylim( (-3e-6, 3e-6) )
     plt.show()
     
     plt.plot( (-100, 100), (0,0), 'k-')
     plt.plot( (0,0), (-100, 100), 'k-')
     plt.plot( x, f2 - p6c_helper(x), 'r-')
+    print(np.max(f2-p6c_helper(x)))
     plt.xlim( (-.1, 2*np.pi+.1) )
-    plt.ylim( (-2e-15, 2e-15) )
+    plt.ylim( (-1e-2, 1e-2) )
     plt.show()
     
 def square(t):

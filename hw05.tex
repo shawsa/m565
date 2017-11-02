@@ -171,7 +171,6 @@
 	\begin{bmatrix}
 	d_0 \\
 	d_1 \\
-	d_2 \\
 	\vdots \\
 	d_{n-1} \\
 	d_n \\
@@ -180,7 +179,6 @@
 	\begin{bmatrix}
 	0 \\
 	3(h_1\delta_{0} + h_{0}\delta_{1}) \\
-	3(h_2\delta_{1} + h_{1}\delta_{2}) \\
 	\vdots \\
 	3(h_{n-1}\delta_{n-2} + h_{n-2}\delta_{n-1}) \\
 	3(h_{n-1}\delta_0 + h_0\delta_{n-1}) \\
@@ -280,7 +278,7 @@ def p2d():
 \problem{3} In figure (\ref{hw5_p3_fig1}) the sample points can be seen in blue, the piecewise-linear interpolation can be seen in green and the periodic cubic spline interpolation can be seen in red.
 	
 	\begin{figure}[H]
-		\caption{Plot of sample points from $f(x)$, the periodic cubic spline, and the not-a-knot cubic spline}
+		\caption{Plot of sample points from, the parametric periodic piecewise-cubic spline, and the peicewise-linear interpolation.}
 		\includegraphics[width=0.80\textwidth]{hw5_p3_fig1}
 		\label{hw5_p3_fig1}
 		\centering
@@ -314,5 +312,124 @@ def p3():
 	\end{lstlisting}
 	
 	
+\problem{4} Figure (\ref{hw5_p4_fig1}) shows topographical data of a two-ravine drainage from Upper State NY (purple), along with the interpolating radial basis function thin plate spline (surface from yellow to red).
+
+	Figure (\ref{hw5_p4_fig2}) shows the same data (red points) in a contour plot of the approximated depth of the surface.
+
+	\begin{figure}[h]
+		\caption{Topographical data of two-ravine drainage from Upper State NY, along with the interpolating radial basis function thin plate spline.}
+		\includegraphics[width=1.0\textwidth]{hw5_p4_fig1}
+		\label{hw5_p4_fig1}
+		\centering
+	\end{figure}
+
+	\begin{figure}[h]
+		\caption{Topographical data of two-ravine drainage from Upper State NY, along with the interpolating radial basis function thin plate spline.}
+		\includegraphics[width=1.0\textwidth]{hw5_p4_fig2}
+		\label{hw5_p4_fig2}
+		\centering
+	\end{figure}
+
+\problem{5 (Piecewise quadratic interpolation)} Each paraboloa in a piecewise quadratic is uniquely determined by three pieces of information. We would like each parabola to interpolate the points (2 peices of information) while being as smooth as possible. We can only require that the first derivatives be equal. To require the second derivatives to be equal would create an over determined system. Let each peice of our piecewise quadratic function be defined 
+
+$$
+s_j(x) = y_j + d_j(x-x_j) + c_j(x-x_j)^2 \text{ when } x_j \leq x \leq x_{j+1}
+$$
+
+where $(x_j,y_j)$ are the points to be interpolated and $d_j$ is the derivative of $s_j$ and $s_{j+1}$ at $x_j$. Define $h_j = (x_{j+1}-x_j)$ and $\delta_j = (y_{j+1}-y_j)/h_j$, then
+\begin{align*}
+	s_j(x_{j+1}) & = s_{j+1}(x_{j+1}) \\
+	y_j + d_jh_j + c_jh_j^2 & = y_{j+1} \\
+	d_j + c_jh_j = \delta_j \\
+	c_j & = \frac{\delta_j - d_j}{h_j}
+\end{align*} 
+and 
+\begin{align*}
+	s_j^\prime(x_{j+1}) & = s_{j+1}^\prime(x_{j+1}) \\
+	d_j + 2c_jh_j & = d_{j+1} \\
+	c_j & = \frac{d_{j+1} - d_j}{2h_j}
+\end{align*}
+Using both of these equations we obtain
+\begin{align*}
+	\frac{d_{j+1} - d_j}{2h_j} & = \frac{\delta_j - d_j}{h_j} \\
+	h_j(d_{j+1} - d_j) & = 2h_j(\delta_j - d_j) \\
+	d_j + d_{j+1} & = 2\delta_j
+\end{align*}
+These conditions hold for $j=0, ..., n-1$. Thus we have $n$ equations and $n-1$ unknowns. One more condition will completely determine the system. We could for example require $s_0(x_0) = s_{n-1}(x_n)$ but then it may not be smooth. We coulde choose the derivative at one of the points, but then we have no control over the derivatives at the end points. If we set the derivative at one of the points (say it is zero for example, an analogue to the natrual cubic case) we have no control over the derivative at the other end point. \bigbreak
+
+In the cubic case, we have more control and flexibility over the behavior of our spline at the end points. The big O order is the same since the bulk of the work is done in solving the $(x+1)\times(n+1)$ linear system.
+
+\problem{6 (Barycentric trigonometric interpolation) (a)}
+
+	Below is my code for the barycentric trigonometric interpolation.
+	
+	\begin{lstlisting}
+def trig_interp(y, u):
+	N = len(y)
+	if N%2 == 0:
+		raise ValueError("y must contain an odd number of values.")
+	k = np.linspace(0, 2*np.pi, N, endpoint=False)
+	f = []
+	sign = np.array( [ (-1)**k for k in range(0,N)] )
+	for t in u:
+		if t in k:
+			p = y[ int(np.argwhere(k==t)) ]
+		else:
+			denominator = sign / np.sin( (t - k)/2 )
+			numerator = denominator * y
+			p = np.sum(numerator)/np.sum(denominator)
+		f.append(p)
+	return f
+	\end{lstlisting}
+	
+\problem{6 (b)} The code above is verified by interpolating the function $f(t)=\sin(2t)\cos(3t)$ by sampling it at 11 equally spaced points. Plots of the interpolating function and the origional function appear in figure (\ref{hw5_p6_fig1}). The function $f$ is in green and the trigonometric interpolation was graphed in red but is such a close approximation that it is not visible. The points in blue are the sample points. \bigbreak
+
+In figure (\ref{hw5_p6_fig2}) can be seen the error $f-p$ where $p$ is the trigonometric interpolation. As expected, the maximum error is less than $2 \times 10^{-15}$, a very good approximation indeed.
+
+\begin{figure}[h]
+	\caption{$f(t)=\sin(2t)\cos(3t)$ and the trigonometric interpolation}
+	\includegraphics[width=.8\textwidth]{hw5_p6_fig1}
+	\label{hw5_p6_fig1}
+	\centering
+\end{figure}
+
+\begin{figure}[h]
+	\caption{Error of the trigonometric interpolation of the function $f(t)=\sin(2t)\cos(3t)$}
+	\includegraphics[width=.8\textwidth]{hw5_p6_fig2}
+	\label{hw5_p6_fig2}
+	\centering
+\end{figure}
+
+\problem{6 (c)} In figure (\ref{hw5_p6_fig3}) is the plot of the trigonometric interpolant of the function $f(t) = \sin(20 e^{\cos(t-\frac{1}{2})})$ through $101$ equally spaced sample points. In figure (\ref{hw5_p6_fig4}) is the error of the trigonometric interpolation. It is less than $3 \times 10^{-6}$ at all points in our interval. In figure (\ref{hw5_p6_fig5}) is the error of the piecewise cubic spline interpolated at the Chebyshev points. While the error stays below 0.01, it is not as good an approximation as the trigonometric interpolation. Since the choice of the Chebyshev points makes the best approximation for the piecewise cubic spline, we can say for certain that the trigonometric interpolation is better than any peicewise cubic spline approximation of this function.
+
+\begin{figure}[h]
+	\caption{Trigonometric interpolation of $f(t) = \sin(20 e^{\cos(t-\tfrac{1}{2})})$ at 101 equally spaced sample points}
+	\includegraphics[width=.8\textwidth]{hw5_p6_fig3}
+	\label{hw5_p6_fig3}
+	\centering
+\end{figure}
+
+\begin{figure}[h]
+	\caption{Error of the trigonometric interpolant of $f(t) = \sin(20 e^{\cos(t-\tfrac{1}{2})})$ at 101 equally spaced sample points}
+	\includegraphics[width=.8\textwidth]{hw5_p6_fig4}
+	\label{hw5_p6_fig4}
+	\centering
+\end{figure}
+
+\begin{figure}[h]
+	\caption{Error of the global interpolant of $f(t) = \sin(20 e^{\cos(t-\tfrac{1}{2})})$ at 101 Chebyshev points}
+	\includegraphics[width=.8\textwidth]{hw5_p6_fig5}
+	\label{hw5_p6_fig5}
+	\centering
+\end{figure}
+
+\problem{6 (d)} In figure (\ref{hw5_p6_fig6}) can be seen the trigonometric interpolation for the square wave of period $2\pi$ sampled at $101$ equally spaced samples over this interval and interpolated/extrapolated over the interval $[0,6\pi]$. The Gibb's Phenomenon can be seen near the clifs in the square wave. The maximum value (amplitude) of the trigonometric interpolant is approximately $1.2728$ which is close to the expected fixed constant $1.28114$. 
+
+\begin{figure}[h]
+	\caption{Square wave of period $2\pi$ and the trigonometric interpolant}
+	\includegraphics[width=1.0\textwidth]{hw5_p6_fig6}
+	\label{hw5_p6_fig6}
+	\centering
+\end{figure}
 
 \end{document}
