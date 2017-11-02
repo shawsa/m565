@@ -147,17 +147,172 @@
 	
 	As in the general case for $k = 1, ..., n-1$ we have
 	$$
-	h_kd_{k-1} + 2(h_{k+1} + h_{k})d_k + h_{k-1}d_{k+1} = 3(h_k\delta_{k-1} + h_{k-1}\delta_{k}
+	h_kd_{k-1} + 2(h_{k+1} + h_{k})d_k + h_{k-1}d_{k+1} = 3(h_k\delta_{k-1} + h_{k-1}\delta_{k})
 	$$
-	In order to solve the system we need two more equations which we will get from our periodic end conditions. Frome the condition $s_0^\prime(x_0) = s_{n-1}^\prime(x_n)$ we know that $d_0 = d_n$. From $s_0^{\prime\prime}(x_0) = s_{n-1}^{\prime\prime}(x_n)$ we know that
+	In order to solve the system we need two more equations which we will get from our periodic end conditions. From the condition $s_0^\prime(x_0) = s_{n-1}^\prime(x_n)$ we know that $d_0 = d_n$. From $s_0^{\prime\prime}(x_0) = s_{n-1}^{\prime\prime}(x_n)$ we know that
 	\begin{align*}
 		2c_0 & = 2c_{n-1} + 6b_{n-1}h_{n-1} \\
 		c_0h_0h_{n-1} & = c_{n-1}h_0h_{n-1} + 3b_{n-1}h_{n-1}h_0h_{n-1} \\
 		(3\delta_0 - 2d_0 - d_1)h_{n-1} & = (3\delta_{n-1} - 2d_{n-1} - d_n)h_{0} + 3(d_{n-1} -2\delta_{n-1} + d_n)h_{0} \\
-		3(h_{n-1}\delta_0 + h_0\delta_{n-1}) & = 2h_{n-1} d_0 + h_{n-1}d_1 - h_0d_{n-1} + 2h_0d_n 
+		3(h_{n-1}\delta_0 + h_0\delta_{n-1}) & = 2h_{n-1} d_0 + h_{n-1}d_1 + h_0d_{n-1} + 2h_0d_n 
 	\end{align*}
 	
+\problem{2 (b)}
 
+	From part (a) we have the linear system $A\vec{d} = \vec{b}$
+	$$
+	\begin{bmatrix}
+	1 & & & \dots & -1\\
+	h_1 & 2(h_1+h_0) & h_0\\
+	& \ddots & \ddots & \ddots \\
+	& & h_{n-1} & 2(h_{n-1}+h_{n-2}) & h_{n-2} \\
+	2h_{n-1} & h_{n-1} & & h_0 & 2h_0 \\
+	\end{bmatrix}
+	\begin{bmatrix}
+	d_0 \\
+	d_1 \\
+	d_2 \\
+	\vdots \\
+	d_{n-1} \\
+	d_n \\
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+	0 \\
+	3(h_1\delta_{0} + h_{0}\delta_{1}) \\
+	3(h_2\delta_{1} + h_{1}\delta_{2}) \\
+	\vdots \\
+	3(h_{n-1}\delta_{n-2} + h_{n-2}\delta_{n-1}) \\
+	3(h_{n-1}\delta_0 + h_0\delta_{n-1}) \\
+	\end{bmatrix}	
+	$$
+	
+\problem{2 (c)} Code for periodic piecewise cubic spline:
+	\begin{lstlisting}
+def piecewise_interp(xs, ys, us):
+	#periodic piecewise interpolation
+	
+	#sort the data
+	xs = np.array(xs)
+	p = xs.argsort()
+	xs = xs[p]
+	ys = np.array(ys)[p]
+	us = np.sort(us)
+	
+	n = len(xs)
+	hs = xs[1:] - xs[:-1]
+	
+	delta = (ys[1:] - ys[:-1]) / hs
+	
+	A = np.zeros( (n,n) )
+	for i in range(1, n-1):
+		A[i, i-1] = hs[i]
+		A[i, i] = 2*(hs[i]+hs[i-1])
+		A[i, i+1] = hs[i-1]
+	A[n-1, 0] = 2*hs[n-2]
+	A[n-1, 1] = hs[n-2]
+	A[n-1, n-2] = hs[0]
+	A[n-1, n-1] = 2*hs[0]
+	
+	B = np.zeros( (n, 1) )
+	for i in range(1, n-1):
+		B[i] = 3*( hs[i]*delta[i-1] + hs[i-1]*delta[i] )
+	
+	A[0,0] = 1
+	A[0,n-1] = -1
+	B[n-1] = 3*( hs[-1]*delta[0] + hs[0]*delta[-1] )
+	
+	d = np.linalg.solve(A, B)
+	d.shape = (n,)
+	
+	b = (d[:-1] -2*delta + d[1:])/(hs*hs)
+	c = (3*delta - 2*d[:-1] - d[1:])/(hs)
+	
+	f = np.zeros( len(us) )
+	j = 0
+	for i, u in enumerate(us):
+		while xs[j+1] < u:
+			j += 1
+			if j >= n-1:
+				j = n-2
+				break
+		dis = u - xs[j] 
+		f[i] = ys[j] + d[j]*dis + c[j]*dis**2 + b[j]*dis**3
+	return f
+	\end{lstlisting}
+	
+\problem{2 (d)} In figure (\ref{hw5_p2_fig1}) can be seen sample points of $f(x) = \sin(\pi(x-0.01))$ in blue, the periodic cubic spline in red, and the not-a-knot cubic spline in green. The periodic cubic spline appears to be roughly as good an approximation of $f$ as the not-a-knot cubic spline.
+
+	\begin{figure}[H]
+		\caption{Plot of sample points from $f(x)$, the periodic cubic spline, and the not-a-knot cubic spline}
+		\includegraphics[width=0.80\textwidth]{hw5_p2_fig1}
+		\label{hw5_p2_fig1}
+		\centering
+	\end{figure}
+
+
+	The code that was used to generate figure (\ref{hw5_p2_fig1}) appears below
+	\begin{lstlisting}
+def p2d():
+	xs = []
+	for i in range(0,6):
+		xs.append( np.sin(np.pi * i / 10) - 1 )
+	for i in range(6, 11):
+		xs.append( 1 - np.sin(np.pi * i / 10) )
+	xs = np.array(xs)
+	ys = np.sin( np.pi*(xs - 0.1) )
+	us = np.linspace(-1, 1, 100)
+	fs = piecewise_interp(xs, ys, us)
+	
+	plt.plot( (-100, 100), (0,0), 'k-')
+	plt.plot( (0,0), (-100, 100), 'k-')
+	plt.plot( xs, ys, 'bo')
+	plt.plot( us, fs, 'r-')
+	
+	cs = CubicSpline(xs,ys)
+	plt.plot(us, cs(us), 'g-')
+	
+	plt.xlim( (-1.1, 1.1) )
+	plt.ylim( (-1.1, 1.1) )
+	plt.show()
+	\end{lstlisting}
+	
+\problem{3} In figure (\ref{hw5_p3_fig1}) the sample points can be seen in blue, the piecewise-linear interpolation can be seen in green and the periodic cubic spline interpolation can be seen in red.
+	
+	\begin{figure}[H]
+		\caption{Plot of sample points from $f(x)$, the periodic cubic spline, and the not-a-knot cubic spline}
+		\includegraphics[width=0.80\textwidth]{hw5_p3_fig1}
+		\label{hw5_p3_fig1}
+		\centering
+	\end{figure}
+	
+	The code that generated figure (\ref{hw5_p3_fig1}) appears below.
+	
+	\begin{lstlisting}
+def p3():
+	str = open('res/hw5_DotToDot.txt', 'r').read()
+	x = []
+	y = []
+	for l in str.split('\n'):
+		xy = l.split('\t')
+		x.append( float(xy[0]))
+		y.append( float(xy[1]))
+	t = np.linspace(0, 1, len(x))
+	u = np.linspace(0, 1, len(x)*100)
+	fx = piecewise_interp(t, x, u)
+	fy = piecewise_interp(t, y, u)
+	
+	plt.plot( (-100, 100), (0,0), 'k-')
+	plt.plot( (0,0), (-100, 100), 'k-')
+	plt.plot( x, y, 'bo')
+	plt.plot( x, y, 'g-')
+	plt.plot( fx, fy, 'r-')
+	
+	plt.xlim( (0, 1.1) )
+	plt.ylim( (0, 1.1) )
+	plt.show()
+	\end{lstlisting}
+	
 	
 
 \end{document}

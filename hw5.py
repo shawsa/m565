@@ -103,18 +103,6 @@ def piecewise_interp(xs, ys, us):
     for i in range(1, n-1):
         B[i] = 3*( hs[i]*delta[i-1] + hs[i-1]*delta[i] )
     
-    '''
-    if type == 'not-a-knot':
-        A[0,0] = hs[1]**2
-        A[0,1] = hs[1]**2 - hs[0]**2
-        A[0,2] = -hs[0]**2
-        B[0] = 2*(hs[1]**2 * delta[0] - hs[0]**2 * delta[1])
-        A[n-1,n-3] = hs[-1]**2
-        A[n-1,n-2] = hs[-1]**2 - hs[-2]**2
-        A[n-1,n-1] = -hs[-2]**2
-        B[n-1] = 2*(hs[-1]**2 * delta[-2] - hs[-2]**2 * delta[-1])
-    '''
-    #elif type == 'periodic':
     A[0,0] = 1
     A[0,n-1] = -1
     B[n-1] = 3*( hs[-1]*delta[0] + hs[0]*delta[-1] )
@@ -132,7 +120,6 @@ def piecewise_interp(xs, ys, us):
             j += 1
             if j >= n-1:
                 j = n-2
-                
                 break
         dis = u - xs[j] 
         f[i] = ys[j] + d[j]*dis + c[j]*dis**2 + b[j]*dis**3
@@ -162,8 +149,7 @@ def p2d():
     for i in range(6, 11):
         xs.append( 1 - np.sin(np.pi * i / 10) )
     xs = np.array(xs)
-    print(xs)
-    ys = np.sin( np.pi*(xs - .01) )
+    ys = np.sin( np.pi*(xs - 0.1) )
     us = np.linspace(-1, 1, 100)
     fs = piecewise_interp(xs, ys, us)
     
@@ -171,9 +157,6 @@ def p2d():
     plt.plot( (0,0), (-100, 100), 'k-')
     plt.plot( xs, ys, 'bo')
     plt.plot( us, fs, 'r-')
-    
-    #fs = piecewise_interp(xs, ys, us, type='not-a-knot')
-    #plt.plot( us, fs, 'g-')
     
     cs = CubicSpline(xs,ys)
     plt.plot(us, cs(us), 'g-')
