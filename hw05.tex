@@ -85,6 +85,79 @@
 	
 {\large \textbf{HW 5}}\bigbreak
 
-\problem{1 (Natural cubic spline)}  
+\problem{1 (Natural cubic spline) (a)} 
+
+	From our natural end condition we know that $s_1^{\prime\prime}(x_2)=0$. Thus \\$-\tfrac{3}{2} + 6d_1(4-3) = 0$ gives us that $d_1 = \tfrac{1}{4}$. Since $s_1$ interpolates the point $(4,0)$ we know that $s_1(4)=0$ so 
+
+	\begin{align*}
+		0 & = 1 + b_1(4-3) - \tfrac{3}{4}(4-3)^2 + \tfrac{1}{4}(4-3)^3\\
+		& = \tfrac{1}{2} + b_1 \\
+		-\tfrac{1}{2} & = b_1
+	\end{align*}
+
+	Frome the condition that $s_0^{\prime\prime}(3) = s_1^{\prime\prime}(3)$ we have that
+	\begin{align*}
+		s_0^{\prime\prime}(3) & = s_1^{\prime\prime}(3) \\
+		6d_0(3-1) & = -\tfrac{3}{2} + 6d_1(3-3) \\
+		d_0 & = -\tfrac{1}{8}
+	\end{align*}
+
+	From the condition that $s_0^\prime(3) = s_1^\prime(3)$ we have
+	\begin{align*}
+		s_0^\prime(3) & = s_1^\prime(3)\\
+		b_0 - \tfrac{3}{8}(3-1)^2 & = b_1 = -\tfrac{1}{2} \\
+		b_0 & = 1
+	\end{align*}
+	
+	Thus our values are $b_0 = 1, d_0 =-\tfrac{1}{8}, b_1 = -\tfrac{1}{2}$, and $ d_1 = \tfrac{1}{4}$. 
+	
+\problem{1 (b)} Using the Newton's divided difference table we have
+
+	\begin{center}
+		\begin{tabular}{|c|c|c|c|}\hline
+			$x_i$ & $f[\cdot]$ & $f[\cdot,\cdot]$ & $f[\cdot,\cdot,\cdot]$ \\ \hline
+			1 & 0 & & \\ \hline
+			3 & 1 & $\tfrac{1}{2}$ &\\ \hline
+			4 & 0 & -1 & $0-\tfrac{1}{2}$ \\ \hline
+		\end{tabular}
+	\end{center}
+	so our global interpolating polynomial is 
+	$$
+	p_2 = 0 + \tfrac{1}{2}(x-1) - \tfrac{1}{2}(x-1)(x-3) = \tfrac{1}{2}(-4+5x-x^2)
+	$$
+	Then
+	\begin{align*}
+		\int_1^4 [s^{\prime\prime}(x)]^2 dx & = \int_1^3 [s_0^{\prime\prime}(x)]^2 dx + \int_3^4 [s_1^{\prime\prime}(x)]^2 dx \\
+		& = \int_1^3 [-\tfrac{6}{8}(x-1)]^2 dx + \int_3^4 [-\tfrac{3}{2} + \tfrac{3}{2}(x-3)]^2 dx \\
+		& = \int_1^3 \tfrac{9}{16}(x-1)^2 dx + \int_3^4 [\tfrac{3}{2}(x-4)]^2 dx \\
+		& = \int_1^3 \tfrac{9}{16}(x-1)^2 dx + \int_3^4 \tfrac{9}{4}(x-4)^2 dx \\
+		& = \tfrac{3}{16}(x-1)^3 \Big\vert_1^3 + \tfrac{3}{4}(x-4)^3 \Big\vert_3^4 \\
+		& = \tfrac{3}{2} + \tfrac{3}{4} \\
+		& = \tfrac{9}{4}
+	\end{align*}
+	and 
+	\begin{align*}
+		\int_1^4 [p_2^{\prime\prime}(x)]^2 dx & = \int_1^4 [\tfrac{1}{2}(-2)]^2 dx \\
+		& = \int_1^4 1 dx \\
+		& = 3
+	\end{align*}
+	Indeed $\int_1^4 [s^{\prime\prime}(x)]^2 dx < \int_1^4 [p_2^{\prime\prime}(x)]^2 dx$.
+	
+\problem{2 (Periodic Cubic Spline) (a)}
+	
+	As in the general case for $k = 1, ..., n-1$ we have
+	$$
+	h_kd_{k-1} + 2(h_{k+1} + h_{k})d_k + h_{k-1}d_{k+1} = 3(h_k\delta_{k-1} + h_{k-1}\delta_{k}
+	$$
+	In order to solve the system we need two more equations which we will get from our periodic end conditions. Frome the condition $s_0^\prime(x_0) = s_{n-1}^\prime(x_n)$ we know that $d_0 = d_n$. From $s_0^{\prime\prime}(x_0) = s_{n-1}^{\prime\prime}(x_n)$ we know that
+	\begin{align*}
+		2c_0 & = 2c_{n-1} + 6b_{n-1}h_{n-1} \\
+		c_0h_0h_{n-1} & = c_{n-1}h_0h_{n-1} + 3b_{n-1}h_{n-1}h_0h_{n-1} \\
+		(3\delta_0 - 2d_0 - d_1)h_{n-1} & = (3\delta_{n-1} - 2d_{n-1} - d_n)h_{0} + 3(d_{n-1} -2\delta_{n-1} + d_n)h_{0} \\
+		3(h_{n-1}\delta_0 + h_0\delta_{n-1}) & = 2h_{n-1} d_0 + h_{n-1}d_1 - h_0d_{n-1} + 2h_0d_n 
+	\end{align*}
+	
+
+	
 
 \end{document}

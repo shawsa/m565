@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.interpolate import CubicSpline
+from hw4 import polyinterp
 
 def p1():
     plt.plot( (-100, 100), (0,0), 'k-')
@@ -181,4 +182,129 @@ def p2d():
     plt.ylim( (-1.1, 1.1) )
     plt.show()
     
+def p3():
+    str = open('res/hw5_DotToDot.txt', 'r').read()
+    x = []
+    y = []
+    for l in str.split('\n'):
+        xy = l.split('\t')
+        x.append( float(xy[0]))
+        y.append( float(xy[1]))
+    t = np.linspace(0, 1, len(x))
+    u = np.linspace(0, 1, len(x)*100)
+    fx = piecewise_interp(t, x, u)
+    fy = piecewise_interp(t, y, u)
+    
+    plt.plot( (-100, 100), (0,0), 'k-')
+    plt.plot( (0,0), (-100, 100), 'k-')
+    plt.plot( x, y, 'bo')
+    plt.plot( x, y, 'g-')
+    plt.plot( fx, fy, 'r-')
+    
+    plt.xlim( (0, 1.1) )
+    plt.ylim( (0, 1.1) )
+    plt.show()
+    
+def trig_interp(y, u):
+    N = len(y)
+    if N%2 == 0:
+        raise ValueError("y must contain an odd number of values.")
+    k = np.linspace(0, 2*np.pi, N, endpoint=False)
+    f = []
+    sign = np.array( [ (-1)**k for k in range(0,N)] )
+    for t in u:
+        if t in k:
+            p = y[ int(np.argwhere(k==t)) ]
+        else:
+            denominator = sign / np.sin( (t - k)/2 )
+            numerator = denominator * y
+            p = np.sum(numerator)/np.sum(denominator)
+        f.append(p)
+        
+    return f
+
+def p6b_helper(t):
+    return np.sin(2*t)*np.cos(3*t)
+    
+def p6b():
+    k = np.linspace(0, 2*np.pi, 11, endpoint=False)
+    y = p6b_helper(k)
+    
+    x = np.linspace(0,2*np.pi, 111)
+    f = trig_interp(y, x)
+    
+    plt.plot( (-100, 100), (0,0), 'k-')
+    plt.plot( (0,0), (-100, 100), 'k-')
+    plt.plot( x, f, 'r-')
+    plt.plot( k, y, 'bo')
+    plt.plot( x, p6b_helper(x), 'g-')
+    plt.xlim( (-.1, 2*np.pi+.1) )
+    plt.ylim( (-1.1, 1.1) )
+    plt.show()
+    
+    plt.plot( (-100, 100), (0,0), 'k-')
+    plt.plot( (0,0), (-100, 100), 'k-')
+    plt.plot( x, f - p6b_helper(x), 'r-')
+    plt.xlim( (-.1, 2*np.pi+.1) )
+    plt.ylim( (-2e-15, 2e-15) )
+    plt.show()
+    
+def p6c_helper(t):
+    return np.sin(np.exp(np.cos(t - .5)))
+    
+def p6c():
+    k = np.linspace(0, 2*np.pi, 101, endpoint=False)
+    y = p6c_helper(k)
+    
+    x = np.linspace(0,2*np.pi, 1001)
+    f = trig_interp(y, x)
+    
+    chebyshev = np.array( [ np.pi*(1 - np.cos(j*np.pi/100)) for j in range(101)] )
+    y2 = p6c_helper(chebyshev)
+    f2 = polyinterp(x, chebyshev, y2)
+    
+    plt.plot( (-100, 100), (0,0), 'k-')
+    plt.plot( (0,0), (-100, 100), 'k-')
+    plt.plot( x, f, 'r-')
+    plt.plot( x, f2, 'g-')
+    plt.plot( k, y, 'bo')
+    plt.plot( x, p6c_helper(x), 'g-')
+    plt.xlim( (-.1, 2*np.pi+.1) )
+    plt.ylim( (-1.1, 1.1) )
+    plt.show()
+    
+    plt.plot( (-100, 100), (0,0), 'k-')
+    plt.plot( (0,0), (-100, 100), 'k-')
+    plt.plot( x, f - p6c_helper(x), 'r-')
+    plt.xlim( (-.1, 2*np.pi+.1) )
+    plt.ylim( (-2e-15, 2e-15) )
+    plt.show()
+    
+    plt.plot( (-100, 100), (0,0), 'k-')
+    plt.plot( (0,0), (-100, 100), 'k-')
+    plt.plot( x, f2 - p6c_helper(x), 'r-')
+    plt.xlim( (-.1, 2*np.pi+.1) )
+    plt.ylim( (-2e-15, 2e-15) )
+    plt.show()
+    
+def square(t):
+    if t%(2*np.pi) < np.pi:
+        return 1
+    else:
+        return -1
+    
+def p6d():
+    np_square = np.vectorize(square)
+    k = np.linspace(0, 2*np.pi, 101, endpoint=False)
+    y = np_square(k)
+    x = np.linspace(0, 6*np.pi, 10001)
+    f = trig_interp(y,x)
+    
+    plt.plot(x, np_square(x), 'b-')
+    plt.plot(x, f, 'r-')
+    
+    plt.xlim(0,6*np.pi)
+    plt.show()
+    
+    print("Max amplitude: %f" % np.max(f))
     
