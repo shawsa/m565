@@ -205,5 +205,114 @@ def p1():
 		& = \frac{\tfrac{2}{3}}{1} = \tfrac{1}{3}
 	\end{align*}
 	Thus $\phi_2 = x^2 - \tfrac{1}{3}$.
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{3} 
+
+	\begin{proof}
+		Given two Legendre polynomials, $f_j$ and $f_k$ consider the transformation $x=\frac{2t-(a+b)}{(b-a)}$ in the following integral
+		\begin{align*}
+			\int_a^b f_j(t)f_k(t) dt & = \int_{-1}^1f_j(x)f_k(x) \frac{(b-a)}{2} dx \\
+			& = \frac{2}{(b-a)} \int_{-1}^1f_j(x)f_k(x) dx \\
+			& = 
+				\begin{cases} 
+					0 & j \neq k\\
+					\frac{(b-a)}{2} \frac{2}{2j+1} & j=k \\
+				\end{cases}\\
+			& = 
+				\begin{cases} 
+					0 & j \neq k\\
+					\frac{b-a}{2j+1} & j=k \\
+				\end{cases}
+		\end{align*}
+	\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{4} 
+
+	\begin{lstlisting}
+def p4():
+	deg = 4
+	c = np.zeros(deg+1)
+	dom = [-np.pi, np.pi]
+	for i in range(0,5):
+		coef = np.zeros(deg+1)
+		coef[i] = 1
+		prod = lambda x: Legendre(coef, dom)(x)**2
+		den = integrate.quad(prod, -np.pi, np.pi)
+		prod = lambda x: Legendre(coef, dom)(x)*np.cos(x)
+		num = integrate.quad(prod, -np.pi, np.pi)
+		c[i] = num[0]/den[0]
+	p = Legendre(c, dom)
+	#plot them
+	x = np.linspace(-np.pi, np.pi,500)
+	yp = p(x)
+	ycos = np.cos(x)
+	fig, (ax1, ax2) = plt.subplots(2,1, sharex=True)
+	ax1.plot(x,ycos, '-k')
+	ax1.plot(x,yp, '-c')
+	ax2.plot(x, ycos-yp,'-k')
+	plt.show()
+	\end{lstlisting}
+	
+	\begin{figure}[h]
+		\caption{The plot of Cosine along with the degree 4 LS approximation and the error.}
+		\includegraphics[width=1.0\textwidth]{hw6_p4_fig1}
+		\label{legendre_approx}
+		\centering
+	\end{figure}
+
+	The error is the largest near the ends of the domain. 
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{5 (a)} See the attached Maple printout. It verifies that the first 4 terms are accurate. \\
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{5 (b)} 
+
+	\begin{figure}[h]
+		\caption{The errors of the Taylor Series (red) and Chebyshev Series (blue) approximations to $arctan$.}
+		\includegraphics[width=1.0\textwidth]{hw6_p5_fig1}
+		\label{arctan_approx}
+		\centering
+	\end{figure}
+	
+	As predicted the Chebyshev Series is a much better approximator over a larger interval.
+	
+	\begin{lstlisting}
+def taylor_series(x):
+	sum = 0
+	for i in range(11):
+		sum += (-1)**i /(2*i+1) * x**(2*i+1)
+	return sum
+def cheb_series(x):
+	sum = 0
+	alpha = np.sqrt(2)-1
+	coef = np.zeros(11*2+1)
+	for i in range(11):
+		coef[2*i+1] = 1
+		sum += (-1)**i /(2*i+1) * alpha**(2*i+1) * 
+Chebyshev(coef)(x)
+		coef[2*i+1] = 0
+	return 2*sum
+
+def p5b():
+	x = np.linspace(-1, 1, 1000)
+	y = np.arctan(x)
+	yt = taylor_series(x)
+	yc = cheb_series(x)
+	plt.plot(x, y-yt, 'r-')
+	plt.plot(x, y-yc, 'b-')
+	plt.show()
+	print('Max error for Taylor Series: ', np.max(y-yt))
+	print('Max error for Chebyshev Series: ', np.max(y-yc))
+	
+Output: 
+Max error for Taylor Series:  0.022680788954
+Max error for Chebyshev Series:  1.61917090846e-10
+	\end{lstlisting}
+
+
 		
 \end{document}
