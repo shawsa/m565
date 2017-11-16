@@ -272,7 +272,7 @@ def p4():
 \problem{5 (b)} 
 
 	\begin{figure}[h]
-		\caption{The errors of the Taylor Series (red) and Chebyshev Series (blue) approximations to $arctan$.}
+		\caption{The errors of the Taylor Series (red) and Chebyshev Series (blue) approximations to arctan.}
 		\includegraphics[width=1.0\textwidth]{hw6_p5_fig1}
 		\label{arctan_approx}
 		\centering
@@ -313,6 +313,43 @@ Max error for Taylor Series:  0.022680788954
 Max error for Chebyshev Series:  1.61917090846e-10
 	\end{lstlisting}
 
+
+\bigbreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{5 (c)} 
+
+	The error for the polynomial interpolating arctan at 21 Chebyshev points of the second kind looks like it is roughly an order of magnitude higher than the error in the Chebyshev Series expansion. 
+
+	\begin{figure}[h]
+		\caption{The error in the polynomial interpolating arctan at 21 Chebyshev points of the second kind.}
+		\includegraphics[width=1.0\textwidth]{hw6_p5_fig2}
+		\label{arctan_interp_approx}
+		\centering
+	\end{figure}
+	
+	\begin{lstlisting}
+def p5c():
+	x = cheb_points2(21, -1, 1)
+	y = np.arctan(x)
+	u = np.linspace(-1, 1, 1000)
+	p = polyinterp(u,x,y)
+	f = np.arctan(u)
+	print('Max error: ', np.max(np.abs(p-f)))
+	plt.plot(u, f-p, 'r-')
+	plt.show()	
+	
+Output: 
+Max error:  2.05076940152e-09
+	\end{lstlisting}
+
+\bigbreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{5 (d) Extra Credit} 
+
+
+\bigbreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{6 (a)} 
 
 		
 \end{document}

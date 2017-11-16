@@ -6,7 +6,7 @@ import scipy.linalg as la
 import scipy.integrate as integrate
 from pytex import *
 
-from hw4 import polyinterp
+#from hw4 import polyinterp
 
 def p1():
     cond = []
@@ -74,3 +74,47 @@ def p5b():
     print('Max error for Chebyshev Series: ', np.max(y-yc))
     
     
+def polyinterp(u, x, y, w=None):
+    if w == None:
+        w = baryweights(x)
+
+    ret = np.zeros(len(u))
+    for i in range(len(ret)):
+        if u[i] in x:
+            ret[i] = y[np.where(x==u[i])]
+        else:
+            weights = w /(u[i] - x)
+            ret[i] = weights.dot(y)/sum(weights)
+    return ret
+    
+def baryweights(x):
+    w = np.ones(len(x))
+    for j, xj in enumerate(x):
+        for i, xi in enumerate(x): 
+            if j != i:
+                w[j] /= (xj - xi)
+    return w
+    
+def cheb_points2(n, a, b):
+    x = []
+    for j in range(0,n):
+        x.append( -1* np.cos( (j*np.pi)/(n-1) ) )
+    return x
+    
+def p5c():
+    x = cheb_points2(21, -1, 1)
+    y = np.arctan(x)
+    
+    u = np.linspace(-1, 1, 1000)
+    p = polyinterp(u,x,y)
+    
+    f = np.arctan(u)
+    
+    print('Max error: ', np.max(np.abs(p-f)))
+    
+    plt.plot(u, f-p, 'r-')
+    plt.show()
+        
+        
+        
+        
