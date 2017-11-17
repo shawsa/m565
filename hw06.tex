@@ -344,12 +344,56 @@ Max error:  2.05076940152e-09
 
 \bigbreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\problem{5 (d) Extra Credit} 
+\problem{5 (d) Extra Credit} Prove that the Chebyshev polynomials $T_n(x) = \cos(n\arccos(x))$ satisfy the following formula
+$$
+
+$$
 
 
 \bigbreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\problem{6 (a)} 
+\problem{6 (a)} \\
+
+	Let $\{\phi_i(x)\}_{i=1}^n$ be a sequence of orthogonal (with respect to some weight function) polynomials on an interval $[a,b]$. (Notationally I assume that $\phi_m$ is of degree $m$ and thus we have an orthogonal basis.) Let $x_1, x_2, ..., x_n$ be the zeros of $\phi_n(x)$ and assume that $a < x_1, < x_1 < ... < x_n < b$. Show that the Lagrange polynomials of degree $n-1$ based on these are orthogonal (also with respect to some weight function).
+	
+	\begin{proof}
+		The Lagrange polynomials can be written
+		$$
+		L_j(x) = K_j \prod_{\substack{k=1 \\ k \neq j}}^n(x-x_k)
+		$$
+		These constants are known, but irrelevant to this problem. Then for any $i \neq j$
+		\begin{align}
+			\int_a^b w(x)L_i(x)L_j(x) dx & = K_jK_i \int_a^b w(x) \prod_{\substack{k=1 \\ k \neq j}}^n(x-x_k) \prod_{\substack{k=1 \\ k \neq i }}^n(x-x_k)  dx \nonumber \\
+			& = C_0 \int_a^b w(x) \prod_{\substack{k=1 \\ k \neq j \\ k \neq i}}^n(x-x_k)  \prod_{k=1}^n(x-x_k) dx  \nonumber \\
+			& = C_1 \int_a^b w(x) \prod_{\substack{k=1 \\ k \neq j \\ k \neq i}}^n(x-x_k)  \phi_n(x) dx \label{basis_step}\\
+			& = 0
+		\end{align}
+		In the above, step (\ref{basis_step}) is because $\prod\limits_{k=1}^n (x-x_k) = \alpha \phi_n(x)$ since they have the same roots and are of the same degree. The last step is because $\phi_n$ is orthogonal to every polynomial of lower degree.\\
+		Hence, $L_i$ and $L_j$ are orthogonal with respect to $w$. 
+	\end{proof}
+	
+\bigbreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{6 (b)} For a given $f(x)$, let $y_k = f(x_k)$ for the given points above. Let $p_{n-1}(x)$ be the unique polynomial interpolant of degree $n-1$ of the $n$ points. Show that 
+$$
+\norm{p_{n-1}}^2 = \sum_{k=1}^n y_k^2 \norm{L_k}^2
+$$
+
+	\begin{proof}
+		Since $p_{n-1}$ interpolates the points, we know that 
+		$$
+		p_{n-1}(x) = \sum_{i=1}^n y_i L_i(x)
+		$$
+		Then
+		\begin{align*}
+			\norm{p_{n-1}}^2 & = \int_a^b w(x)p_{n-1}^2 dx \\
+			& = \int_a^b w(x)p_{n-1}^2 dx \\
+			& = \int_a^b w(x) \sum_{i=1}^n \sum_{j=1}^n y_iy_j L_i(x)L_j(x) dx \\
+			& = \sum_{i=1}^n \sum_{j=1}^n y_iy_j \int_a^b w(x)   L_i(x)L_j(x) dx \\
+			& = \sum_{i=1}^n y_i^2 \int_a^b w(x)   L_i^2(x) dx \text{\ \ \ since $L_i$ and $L_j$ are orthogonal if $i \neq j$}\\
+			& = \sum_{i=1}^n y_i^2 \norm{L_i}^2
+		\end{align*}
+	\end{proof}
 
 		
 \end{document}
