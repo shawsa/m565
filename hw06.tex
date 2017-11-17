@@ -346,9 +346,27 @@ Max error:  2.05076940152e-09
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \problem{5 (d) Extra Credit} Prove that the Chebyshev polynomials $T_n(x) = \cos(n\arccos(x))$ satisfy the following formula
 $$
-
+T_n(x) = \tfrac{1}{2}(z^n + z^{-n}) \text{\ \ \ \ \ where \ \ \ \ \ } x = \tfrac{1}{2}(z + z^{-1})
 $$
 
+	\begin{proof}
+		Let $x \in [-1,1]$. Define $z = x + i\sqrt{1-x^2}$. Then
+		\begin{align*}
+			\tfrac{1}{2}(z + z^{-1}) & = \tfrac{1}{2} \Bigg(x + i\sqrt{1-x^2} + \frac{1}{x + i\sqrt{1-x^2}} \Bigg) \\
+			& = \tfrac{1}{2} \Bigg(x + i\sqrt{1-x^2} + \frac{1}{x + i\sqrt{1-x^2}} * \frac{x - i\sqrt{1-x^2}}{x - i\sqrt{1-x^2}} \Bigg ) \\ 
+			& = \tfrac{1}{2} \Bigg(x + i\sqrt{1-x^2} + \frac{x - i\sqrt{1-x^2}}{x^2 + (1-x^2)}\Bigg ) \\ 
+			& = \tfrac{1}{2} (x + i\sqrt{1-x^2} + x - i\sqrt{1-x^2} ) \\ 
+			& = x
+		\end{align*}
+		Also note that $\vert z \vert = \sqrt{x^2 + (1-x^2)} = 1$ and $\arg(z) = \arccos(x)$. Let $\theta = \arccos(x)$ for brevity. Then
+		$z = e^{i\theta}$. Finally
+		\begin{align*}
+			\tfrac{1}{2}(z^n + z^{-n}) & = \frac{e^{in\theta} + e^{-in\theta}}{2} \\
+			& = \cos(n\theta) \\
+			& = \cos(n \arccos(x)) \\
+			& = T_n(x)
+		\end{align*}
+	\end{proof}
 
 \bigbreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
