@@ -416,16 +416,20 @@ Error: %f
 
 \bigbreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\problem{4 (a)}
+\problem{4 (a)} Using Romberg integration we approximate the integral
+$$
+I(f_1) = \int_0^1 \frac{4}{1+x^2} dx = \pi
+$$
+by $R_{6,6} = 3.14159265364$.
 
 \bigbreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\problem{4 (b)}
+\problem{4 (b)} The error in the Romberg approximations are shown below.
 
 \begin{center}
 	\begin{tabular}{|c|c|c|}
 		\hline
-		$n$&$R_{i,i}$&err\\ \hline
+		$n$&$R_{n,n}$&err\\ \hline
 		1&3.0&-0.14159265359\\ \hline
 		2&3.13333333333&-0.00825932025646\\ \hline
 		4&3.14211764706&0.000524993469031\\ \hline
@@ -435,6 +439,63 @@ Error: %f
 	\end{tabular}
 \end{center}
 
+\bigbreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{4 (c)} Here is a listing of the code used for the calculation of part (a).
+
+\begin{lstlisting}
+def p4f(x):
+	return 4/(1+x**2)
+
+def p4a():
+	N=5
+	xs = np.linspace(0,1,2**N+1,endpoint=True)
+	fs = p4f(xs)
+	fs[0] *= .5
+	fs[-1] *= .5
+	
+	Rom = np.zeros((N+1,N+1))
+	for i in range(0,N+1):
+		Rom[i][0] = np.sum(fs[::2**(N-i)])/2**i
+	
+	for m in range(1, N+1):
+		for j in range(1, m+1): #j = k-1
+			Rom[m,j] = (4**j * Rom[m,j-1] - 
+Rom[m-1,j-1]) / (4**j - 1)
+	ns = 2**np.arange(0,N+1)
+	Rs = np.array([Rom[i][i] for i in range(0,N+1)])
+	err = Rs - np.pi
+	latex_table( (ns, Rs, err), ('$n$', '$R_{n,n}$', 'err') )
+\end{lstlisting}
+
+\bigbreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{5 (a)} We are given the following integral
+$$
+I(f) = \int_0^1\int_0^1\int_0^1\int_0^1\int_0^1\int_0^1 \sin(\tfrac{\pi}{2}(x_1+x_2+x_3+x_4+x_5+x_6)) dx_1dx_2dx_3dx_4dx_5dx_6
+$$
+The following code uses SymPy (a symbolic math package for Python) and determines that $I(f) = \frac{-512}{\pi^6}$.
+
+\begin{lstlisting}
+def p5a():
+	x = Symbol('x')
+	y = Symbol('y')
+	z = Symbol('z')
+	w = Symbol('w')
+	a = Symbol('a')
+	b = Symbol('b')
+	return integrate(sin(pi/2*(x+y+z+w+a+b)), (x,0,1),(y,0,1),
+(z,0,1),(w,0,1),(a,0,1),(b,0,1))
+********************************
+Output:
+>>> p5a()
+-512/pi**6
+\end{lstlisting}
+
+
+\bigbreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{5 (b)}
 	
 \bigbreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

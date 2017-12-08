@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from pytex import *
+from sympy import *
+from ghalton import *
 
 def trap_int(f, a, b, n):
     h = (b-a)/n
@@ -196,7 +198,32 @@ def p4a():
     latex_table( (ns, Rs, err), ('$n$', '$R_{i,i}$', 'err') )
     
     
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+def p5a():
+    x = Symbol('x')
+    y = Symbol('y')
+    z = Symbol('z')
+    w = Symbol('w')
+    a = Symbol('a')
+    b = Symbol('b')
+    return integrate(sin(pi/2*(x+y+z+w+a+b)), (x,0,1),(y,0,1),(z,0,1),(w,0,1),(a,0,1),(b,0,1))
+
+def p5b():
+    N = 10000
+    points = np.random.rand(N,6)
+    col_sum = np.sum(points, axis=1)
+    QMC = sum( np.sin(np.pi/2 * col_sum) ) / N
+    return QMC
+
+def p5c():
+    N = 10000
+    seq = GeneralizedHalton(6)
+    seq.reset()
+    points = seq.get(N)
+    col_sum = np.sum(points, axis=1)
+    QMC = sum( np.sin(np.pi/2 * col_sum) ) / N
+    return QMC
+
+
     
 gamma = 0.5772156649015328
     
