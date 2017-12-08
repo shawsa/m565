@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pytex import *
 from sympy import *
-from ghalton import *
+#from ghalton import *
 
 def trap_int(f, a, b, n):
     h = (b-a)/n
@@ -214,6 +214,7 @@ def p5b():
     QMC = sum( np.sin(np.pi/2 * col_sum) ) / N
     return QMC
 
+'''
 def p5c():
     N = 10000
     seq = GeneralizedHalton(6)
@@ -222,6 +223,7 @@ def p5c():
     col_sum = np.sum(points, axis=1)
     QMC = sum( np.sin(np.pi/2 * col_sum) ) / N
     return QMC
+'''
 
 
     

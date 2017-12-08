@@ -233,7 +233,8 @@ def p1b():
 		\int_a^b f(x) & \approx \int_a^b p(x) \\
 		& = \int_a^b f(a) + (x-a)f^\prime(a) + (x-a)^2 \frac{f[a,b]-f^\prime(a)}{h} \\
 		& \phantom{=====} + (x-b)(x-a)^2 \frac{f^\prime(b) - 2f[a,b] + f^\prime(a)}{h^2} dx \\
-		& = hf(a) + \tfrac{1}{2}h^2f^\prime(a) + \tfrac{1}{3}h^2 (f[a,b]-f^\prime(a)) - \tfrac{1}{12}h^2 (f^\prime(b) - 2f[a,b] + f^\prime(a))
+		& = hf(a) + \tfrac{1}{2}h^2f^\prime(a) + \tfrac{1}{3}h^2 (f[a,b]-f^\prime(a)) - \tfrac{1}{12}h^2 (f^\prime(b) - 2f[a,b] + f^\prime(a)) \\
+		& = \tfrac{1}{2}hf(a) + \tfrac{1}{2}hf(b) + \tfrac{5}{12}h^2f^\prime(a) - \tfrac{1}{12}h^2f^\prime(b)
 	\end{align*}
 	
 \bigbreak
@@ -495,7 +496,50 @@ Output:
 
 \bigbreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\problem{5 (b)}
+\problem{5 (b)} The following Python script computes a quasi-Monte Carlo approximation to the integral above and finds that $I(f) \approx -0.53900001389065677$ and the error is $0.0085708675600312256$.
+
+\begin{lstlisting}
+def p5b():
+	N = 10000
+	points = np.random.rand(N,6)
+	col_sum = np.sum(points, axis=1)
+	QMC = sum( np.sin(np.pi/2 * col_sum) ) / N
+	return QMC
+********************
+Output
+>>> p5b()
+-0.53900001389065677
+>>> p5b() +521/np.pi**6
+0.0085708675600312256
+\end{lstlisting}
+
+\bigbreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{5 (c)} I found a Python module called ghalton that is supposed to generate Halton Sequences, however it gave inconsistent results. Most of the time it was no better an approximation than the regular pseudorandom approach above, and ever once in a while it would give results comparable to MATLAB. I susspect that the module has an error, or that I misunderstood the documentation. Alas, the MATLAB code is given below. The error in the result using the Halton sequences is $-2.406470957178053e-04$.
+
+\begin{lstlisting}
+rng(11032016);
+N = 10000;
+points = net(haltonset(6),N);
+col_sum = sum(points,2);
+I = sum(sin(pi/2*col_sum))/N + 512/pi^6
+\end{lstlisting}
+
+\bigbreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{5 (d)} The trapezoidal rule applied with $n=10$ points in each dimention gives an error of $0.006539223165815$. The code provided from the problem has been omitted for brevity. 
+
+\begin{lstlisting}
+n = 10;
+[unmodified code given provided in the problem]
+function [y] = f(x1,x2,x3,x4,x5,x6)
+	y = sin(pi/2*(x1+x2+x3+x4+x5+x6));
+end
+\end{lstlisting}
+
+\bigbreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{5 (e)} Using the Trapezoidal rule is the worst approximation and used 100 times as many points. The Halton set points gave us a few more digits of accuracy than the regular pseudorandom points making the quasi-Monte carlo method using Halton set points over the domain the best of the three techniques in this instance. 
 	
 \bigbreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -514,9 +558,9 @@ Output:
 
 \bigbreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\problem{6 (b)} Using the Euler-MacLaurin formula after suming the first $k=2, \dots,20$ terms we can approximate $\gamma$. Let $f(x) = \frac{1}{x} + \log(1-\tfrac{1}{x})$. Then we use the following facts to do so
+\problem{6 (b)} Using the Euler-MacLaurin formula after suming the first $k=2, \dots,19$ terms we can approximate $\gamma$. Let $f(x) = \frac{1}{x} + \log(1-\tfrac{1}{x})$. Then we use the following facts to do so
 \begin{align*}
-	\int_20^\infty f(x) dx & = 38\tanh^{-1}(\tfrac{1}{39}) -1 \\
+	\int_{20}^\infty f(x) dx & = 38\tanh^{-1}(\tfrac{1}{39}) -1 \\
 	f^\prime(x) & = -x^{-2} - x^{-1} + (x-1)^{-1} \\
 	f^{\prime\prime\prime}(x) & = -6x^{-4} - 2x^{-3} + 2(x-1)^{-3} \\
 	f^{(5)}(x) & = -120x^{-6} - 24x^{-5} + 24(x-1)^{-5}
@@ -562,6 +606,43 @@ def p6c():
 	print(approx - gamma)
 \end{lstlisting}
 
+\bigbreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{7 (a)} Given the integral 
+$$\int_0^{2\pi} e^{\cos(x)}dx \approx 7.95492652101284$$
+we would like to estimate the error of the trapezoidal rule. First we define the coefficients of the Fourier series as follows
+\begin{align*}
+	a_0 & = \frac{1}{2\pi} \int_0^{2\pi} e^{\cos(x)}dx & a_n & = \frac{1}{\pi} \int_0^{2\pi} e^{\cos(x)}\cos(nx)dx
+\end{align*}
+Then $e^{\cos(x)} = \sum\limits_0^\infty a_n \cos(nx)$. Note that $2\pi a_0 = \int_0^{2\pi} e^{\cos(x)}dx$. We can then approximate it using the trapezoidal rule as follows
+\begin{align*}
+	\int_0^{2\pi} e^{\cos(x)}dx &= \int_{n=0}^{2\pi} \sum\limits_0^\infty a_n \cos(nx) dx \\
+	& \approx \frac{2\pi}{N}\sideset{}{'}\sum_{k=0}^N \sum\limits_{n=0}^\infty a_n \cos(n\tfrac{2\pi}{N}k) \\
+	& = \frac{2\pi}{N}\sideset{}{'}\sum_{k=0}^N a_0 + \sum\limits_{n=1}^\infty a_n \cos(n\tfrac{2\pi}{N}k) \\
+	& = 2\pi a_0 + \frac{2\pi}{N}\sideset{}{'}\sum_{k=0}^N \sum\limits_{n=1}^\infty a_n \cos(n\tfrac{2\pi}{N}k) \\
+\end{align*}
+This last step follows since the trapezoidal rule is exact for constants. Then our error is given by
+\begin{align*}
+	\text{error} & \approx \frac{2\pi}{N}\sideset{}{'}\sum_{k=0}^N \sum\limits_{n=1}^\infty a_n \cos(n\tfrac{2\pi}{N}k) \\
+	& = \frac{2\pi}{N} \sum_{k=0}^{N-1} \sum\limits_{n=1}^\infty a_n \cos(n\tfrac{2\pi}{N}k) \\
+	& \text{\Big(since $\cos(n\tfrac{2\pi}{N}0) = \cos(n\tfrac{2\pi}{N}N)$ \Big)} \\
+	& = \frac{2\pi}{N}  \sum\limits_{n=1}^\infty a_n \sum_{k=0}^{N-1} \cos(n\tfrac{2\pi}{N}k) \\
+\end{align*}
+From the identity
+$$
+\sum_{k=0}^{N-1} \cos(\omega k) = \cos \Big( \tfrac{1}{2}(N-1)\omega \Big)\csc(\tfrac{\omega}{2})\sin(\tfrac{N\omega}{2})
+$$
+we can see that our sum of cosines is zero except when $n$ is a multiple of $N$. In that case, the right hand side has indeterminant form, but we can easily evaluate the left hand side to be $N$. Thus
+\begin{align*}
+	\text{error} & \approx \frac{2\pi}{N}  \sum\limits_{n=1}^\infty a_n \sum_{k=0}^{N-1} \cos(n\tfrac{2\pi}{N}k) \\
+	& = \frac{2\pi}{N}  \sum\limits_{z=1}^\infty a_{Nz} N \\
+	& = 2\pi  \sum\limits_{z=1}^\infty a_{Nz}
+\end{align*}
+Thus the dominant error term is $2\pi a_N$
+
+\bigbreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\problem{7 (b)} To obtain an accuracy within a tolerance or $10^{-60}$ we want $2\pi a_N \approx 10^{-60}$. Since $\lim\limits_{n \to \infty}a_n 2^{n-2}n! = 1$ we would like $\frac{2\pi}{2^{n-2}n!} \leq 10^{-60}$. A short brute force search finds that we only need $m=41$ nodes before we are within a tollerance of $10^{-60}$.
 
 
 \end{document}
